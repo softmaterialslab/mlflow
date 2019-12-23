@@ -5,7 +5,7 @@
 #M=S (SQL), MODEL=T (STAR)
 
 JOBSCR = ambient.pbs
-LAMMPS_IN = in.squalane.shear
+LAMMPS_IN = in.ambient
 M=T
 NODESIZE=4
 MPI_EXE=mpirun
