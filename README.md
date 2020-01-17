@@ -13,7 +13,7 @@ Subtext: need to see if unsupervised ML can classify features in a complex molec
  ```cd nonadecane```
 * Then, submit the job:
     * For squalane: ```make DIR_PATH=AMB_P1 METHOD=submit M=S CLUSTER=bigred3```
- * For star molecule:  ```make DIR_PATH=AMB_P1 METHOD=submit M=T CLUSTER=bigred3```
+    * For star molecule:  ```make DIR_PATH=AMB_P1 METHOD=submit M=T CLUSTER=bigred3```
 
 ## Install and run instructions on local computer
 * First, git clone the project:
