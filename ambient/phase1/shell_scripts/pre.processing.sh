@@ -10,7 +10,7 @@ while [ $# -gt 0 ]; do
    if [[ $1 == *"-"* ]]; then
         v="${1/-/}"
         declare $v="$2"
-		#echo "$v=${!v}"
+		echo "$v=${!v}"
    fi
 
   shift

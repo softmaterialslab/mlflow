@@ -1,7 +1,7 @@
 #Example runs
-#make run-local-parallel MPI_EXE=mpirun LAMMPS_EXE=lmp_g++ S=1e10 F=1000
-#make run-local-serial LAMMPS_EXE=lmp_g++ S=1e10 F=1000
-#make submit S=1e10 F=1000
+#make run-local-parallel MPI_EXE=mpirun LAMMPS_EXE=lmp_g++ M=T
+#make run-local-serial LAMMPS_EXE=lmp_g++ M=T
+#make submit M=T
 #M=S (SQL), MODEL=T (STAR)
 
 JOBSCR = ambient.pbs
@@ -15,6 +15,7 @@ create-dirs:
 	@echo "Checking and creating needed sub-directories"
 	if ! [ -d outfiles ]; then mkdir outfiles; fi
 	if ! [ -d data ]; then mkdir data; fi
+	if ! [ -d restart_files ]; then mkdir restart_files; fi
 	@echo "Directory creation is over."
 
 run-preprocessor:
@@ -23,7 +24,6 @@ run-preprocessor:
 	cd shell_scripts && ./pre.processing.sh -M $(M) && cd ..
 	@echo "Running the preprocessor is over."
 	
-
 submit: create-dirs run-preprocessor
 	cp jobscripts/$(JOBSCR) .
 	@echo "Launching the job"
@@ -42,6 +42,7 @@ clean:
 
 dataclean:
 	rm -f outfiles/*
+	rm -f restart_files/*
 	rm -f data/*	
 	rm -f *.lammps
 	rm -f *.log
