@@ -5,6 +5,7 @@
 #M=S (SQL), MODEL=T (STAR)
 
 JOBSCR = ambient.pbs
+JOBSCR_bigred3 = bigred3ambient.pbs
 LAMMPS_IN = in.ambient
 M=T
 NODESIZE=4
@@ -27,12 +28,10 @@ run-preprocessor:
 	
 submit: create-dirs run-preprocessor
 ifeq ($(CLUSTER),bigred3)
-	JOBSCR="$(CLUSTER)$(JOBSCR)"
-	cp jobscripts/$(JOBSCR) .
+	cp jobscripts/$(JOBSCR_bigred3) .
 	@echo "Launching the job"
-	sbatch $(JOBSCR)
+	sbatch $(JOBSCR_bigred3)
 else ifeq ($(DIR_PATH),bigred200)
-	JOBSCR="$(CLUSTER)$(JOBSCR)"
 	cp jobscripts/$(JOBSCR) .
 	@echo "Launching the job"
 	qsub $(JOBSCR)
