@@ -1,0 +1,12 @@
+#!	/bin/bash
+#PBS	-l	nodes=4:ppn=16,walltime=2:00:00
+#PBS	-m	ae
+#PBS	-o	out.log
+#PBS	-e	err.log
+#PBS	-N	phase1
+
+module swap PrgEnv-intel PrgEnv-gnu
+module load lammps/gnu
+
+cd	$PBS_O_WORKDIR
+time aprun -n 64 lmp_mpi < in.ambient

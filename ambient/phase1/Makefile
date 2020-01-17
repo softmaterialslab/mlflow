@@ -10,6 +10,7 @@ M=T
 NODESIZE=4
 MPI_EXE=mpirun
 LAMMPS_EXE=lmp_g++
+CLUSTER=bigred3
 
 create-dirs:
 	@echo "Checking and creating needed sub-directories"
@@ -25,10 +26,19 @@ run-preprocessor:
 	@echo "Running the preprocessor is over."
 	
 submit: create-dirs run-preprocessor
+ifeq ($(CLUSTER),bigred3)
+	JOBSCR="$(CLUSTER)$(JOBSCR)"
+	cp jobscripts/$(JOBSCR) .
+	@echo "Launching the job"
+	sbatch $(JOBSCR)
+else ifeq ($(DIR_PATH),bigred200)
+	JOBSCR="$(CLUSTER)$(JOBSCR)"
 	cp jobscripts/$(JOBSCR) .
 	@echo "Launching the job"
 	qsub $(JOBSCR)
-
+endif
+	@echo "Job submitted to $(CLUSTER)";
+	
 local-run-parallel: create-dirs run-preprocessor
 	@echo "Running the job. "
 	time $(MPI_EXE) -n $(NODESIZE) $(LAMMPS_EXE) < $(LAMMPS_IN)
