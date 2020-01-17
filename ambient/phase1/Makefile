@@ -21,7 +21,7 @@ create-dirs:
 run-preprocessor:
 	@echo "Running the preprocessor to create lammps script."
 	chmod +x shell_scripts/pre.processing.sh
-	cd shell_scripts && ./pre.processing.sh -M $(M) && cd ..
+	cd shell_scripts && bash ./pre.processing.sh -M $(M) && cd ..
 	@echo "Running the preprocessor is over."
 	
 submit: create-dirs run-preprocessor
@@ -37,7 +37,7 @@ local-run-serial: create-dirs run-preprocessor
 	@echo "Running the job. "
 	time $(LAMMPS_EXE) < $(LAMMPS_IN)
 
-clean:
+clean: dataclean
 	rm -f $(LAMMPS_IN)
 
 dataclean:
@@ -47,5 +47,6 @@ dataclean:
 	rm -f *.lammps
 	rm -f *.log
 	rm -f *.in
+	rm -f *.pbs	
 
 .PHONY: clean dataclean run-preprocessor create-dirs

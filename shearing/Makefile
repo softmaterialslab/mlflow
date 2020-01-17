@@ -35,7 +35,7 @@ local-run-serial: create-dirs run-preprocessor
 	@echo "Running the job. "
 	time $(LAMMPS_EXE) < $(LAMMPS_IN)
 
-clean:
+clean: dataclean
 	rm -f $(LAMMPS_IN)
 
 dataclean:

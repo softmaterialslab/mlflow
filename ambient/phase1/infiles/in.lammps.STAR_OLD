@@ -5,14 +5,12 @@
 # 2019.09.20: adding comments on the old files for better readability
 # 2019.10.10: more comments added. note that the LAMMPS 2016 version was used to execute the code. some commands may need slight change if your LAMMPS version is different.
 # USER-M-USER is the selected model
-# 2020.01.17: STAR molecule added and updated to work with LAMMPS 2019
 
 units		real
 dimension      	3
 boundary       	p p p
-atom_style       	molecular  # 	bonds, angles, dihedrals, impropers : uncharged molecules
-#molecule       	STAR infiles/UA.MG.STAR.txt
-#atom_style     	template STAR
+molecule       	STAR infiles/UA.MG.STAR.txt
+atom_style     	template STAR
 
 variable       	bl equal 270		# 6 times larger than desired size
 variable       	Nmol equal 125		# turns out to be sufficient for shear studies planned; could do 8X
@@ -33,10 +31,8 @@ variable 	etotal equal etotal
 
 lattice        	fcc 45
 region         	simbox prism 0 ${bl} 0 ${bl} 0 ${bl} 0 0 0 units box side in
-
-create_box     	3 simbox bond/types 1 angle/types 1 dihedral/types 2 improper/types 1 extra/bond/per/atom 2 extra/angle/per/atom 2 extra/dihedral/per/atom 3 extra/improper/per/atom 2 extra/special/per/atom 8
-
-molecule       	STAR infiles/UA.MG.STAR.txt
+create_box     	3 simbox bond/types 1 angle/types 1 dihedral/types 2 improper/types 1 
+# (type1: CH2) (type2: CH3 end) (type3: CH3 side) (type4: CH)
 lattice        	sc 45
 region         	genbox prism 45 225 45 225 45 225 0 0 0 units box
 create_atoms   	0 region genbox mol STAR 621634197 units box
