@@ -100,7 +100,7 @@ thermo_style   	custom step temp vol press density pe etotal
 dump           	gphase1 all atom 10000 outfiles/dumpgphase1.atom	#note this will produce a rather heavy movie file of about 100 MB
 dump_modify    	gphase1 first yes
 dump_modify    	gphase1 scale no
-run            	1000000	# you could perform the compression even more slowly if any irregularities arise during the deformation (can be seen in the movie)
+run            	10000000	# you could perform the compression even more slowly if any irregularities arise during the deformation (can be seen in the movie)
 undump         	gphase1
 write_restart  	restart_files/sql.gphase1.*
 unfix		ensemble
