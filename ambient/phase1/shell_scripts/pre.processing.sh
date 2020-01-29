@@ -1,4 +1,5 @@
 #!/bin/sh
+#!/bin/bash
 # This loads all the variables with -S 1e10 -F 1000 pattern
 # The NEMD simulations expect following valiables.
 # If not given will be defaulted to following values
@@ -25,7 +26,7 @@ then
 fi
 
 # Print program values
-echo "Model = $M"
+echo "Selected modecular model = $M"
 
 # create a LAMMPS input file from the template
 cat ../infiles/in.lammps.$M.template | \
