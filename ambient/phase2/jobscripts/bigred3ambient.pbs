@@ -1,0 +1,22 @@
+#!/bin/bash
+#####  Constructed by Kadupitiya #####
+#SBATCH --mail-user=kadu@iu.edu
+#SBATCH --nodes=4
+#SBATCH --ntasks-per-node=16
+#SBATCH --time=0-2:00:00
+#SBATCH --partition=general
+#SBATCH --mail-type=FAIL,BEGIN,END
+#SBATCH --job-name=phase1
+#SBATCH --output=out.log
+#SBATCH --error=err.log
+
+######  Module commands #####
+module swap PrgEnv-intel PrgEnv-gnu
+module load lammps/gnu
+
+######  Job commands go below this line #####
+cd $SLURM_SUBMIT_DIR
+time srun -n 64 lmp_mpi < in.ambient
+
+
+
