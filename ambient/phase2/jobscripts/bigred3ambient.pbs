@@ -3,10 +3,10 @@
 #SBATCH --mail-user=kadu@iu.edu
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=48
-#SBATCH --time=0-2:00:00
+#SBATCH --time=0-0:15:00
 #SBATCH --partition=general
 #SBATCH --mail-type=FAIL,BEGIN,END
-#SBATCH --job-name=phase1
+#SBATCH --job-name=phase2
 #SBATCH --output=out.log
 #SBATCH --error=err.log
 

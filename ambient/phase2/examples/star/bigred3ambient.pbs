@@ -1,8 +1,8 @@
 #!/bin/bash
 #####  Constructed by Kadupitiya #####
 #SBATCH --mail-user=kadu@iu.edu
-#SBATCH --nodes=2
-#SBATCH --ntasks-per-node=48
+#SBATCH --nodes=4
+#SBATCH --ntasks-per-node=16
 #SBATCH --time=0-2:00:00
 #SBATCH --partition=general
 #SBATCH --mail-type=FAIL,BEGIN,END
