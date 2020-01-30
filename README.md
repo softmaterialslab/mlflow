@@ -9,13 +9,22 @@ Subtext: need to see if unsupervised ML can classify features in a complex molec
 ```module swap PrgEnv-intel PrgEnv-gnu && module load lammps/gnu```
 * Next, go to the root directory:
  ```cd nonadecane```
+### Phase 01
 * Then, submit the job:
     * For squalane: ```make DIR_PATH=AMB_P1 METHOD=submit M=S CLUSTER=bigred3```
     * For star molecule:  ```make DIR_PATH=AMB_P1 METHOD=submit M=T CLUSTER=bigred3```
 * If you want to clean the project:
  ```make clean DIR_PATH=AMB_P1```
+### Phase 02
+* You must have restart file from phase1 to run the phase2
+* Then, submit the job:
+    * For squalane: ```make DIR_PATH=AMB_P2 METHOD=submit M=S CLUSTER=bigred3```
+    * For star molecule:  ```make DIR_PATH=AMB_P2 METHOD=submit M=T CLUSTER=bigred3```
+* If you want to clean the project:
+ ```make clean DIR_PATH=AMB_P2```
 
 ## Installing and running ambient sample on local computer
+* For running different phases of the program: please check bigred3 commands and change local make commands accordingly.
 * First, git clone the project:
 ```git clone https://github.com/softmaterialslab/nonadecane.git```
 * Then, makesure you have either parellel LAMMPS or sequatial LAMMPS available in your environment.
