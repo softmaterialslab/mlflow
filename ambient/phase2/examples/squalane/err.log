@@ -1,5 +1,6 @@
 LAMMPS simulator version 7Dec19 loaded.
+srun: Warning: can't honor --ntasks-per-node set to 48 which doesn't match the requested tasks 64 with the number of requested nodes 2. Ignoring --ntasks-per-node.
 
-real	5m46.247s
-user	0m0.016s
+real	5m17.713s
+user	0m0.008s
 sys	0m0.068s
