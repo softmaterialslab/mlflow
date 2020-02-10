@@ -1,6 +1,8 @@
 LAMMPS simulator version 7Dec19 loaded.
 srun: Warning: can't honor --ntasks-per-node set to 48 which doesn't match the requested tasks 64 with the number of requested nodes 2. Ignoring --ntasks-per-node.
-
-real	5m17.713s
-user	0m0.008s
-sys	0m0.068s
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** STEP 202853.0 ON nid00367 CANCELLED AT 2020-02-02T03:01:10 DUE TO TIME LIMIT ***
+slurmstepd: error: *** JOB 202853 ON nid00367 CANCELLED AT 2020-02-02T03:01:10 DUE TO TIME LIMIT ***
+srun: got SIGCONT
+srun: got SIGCONT
+srun: forcing job termination

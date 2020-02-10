@@ -1,18 +1,16 @@
-# THIS IS A LAMMPS FILE TO GENERATE STAR UNDER AMBIENT CONIDTIONS
+# THIS IS A LAMMPS FILE TO GENERATE SQL UNDER AMBIENT CONIDTIONS
 # phase 2: deforming to adjust density to desired (often close to experimental) value
 
-#molecule       	STAR infiles/UA.MG.STAR.txt
-#atom_style     	template STAR
+#molecule       	SQL infiles/UA.MG.SQL.txt
+#atom_style     	template SQL
 
 atom_style	molecular
 
-variable	scalefactor equal 0.99829968553
+variable	scalefactor equal 0.99193803117
 
 variable       	Nmol equal 125
 variable       	eqmT equal 293
 variable       	eqmP equal 0.987	# 0.1MPa = 0.987 atm
-
-
 variable        pxx equal pxx
 variable        pyy equal pyy
 variable        pzz equal pzz
@@ -26,15 +24,16 @@ variable 	rho equal density
 variable 	vol equal vol
 variable 	etotal equal etotal
 
-read_restart	restart_files/star.gphase1.*	# note that this sample was produced in phase 1
+read_restart	restart_files/sql.gphase1.*	# note that this sample was produced in phase 1
 neighbor       	0.3 bin
 neigh_modify   	every 1 delay 0 check yes
 
 # from Mondello & Grest (1995) JCP 103, 7156: model A 
 # from Moore et al (Cummings group) (2000) JCP 113, 8833
-mass           	1 14.026	# CH2	
-mass           	2 15.034	# CH3
-mass           	3 13.018	# CH
+mass           	1 14.026		
+mass           	2 15.034
+mass           	3 15.034
+mass           	4 13.018
 
 pair_style     	lj/cut 10			# MG do not say if cutoffs obey BL rules
 pair_modify    	shift yes			# MG do not really mention if LJ is shifted in their above cited paper, they do so in a follow-up paper. 
@@ -45,12 +44,16 @@ angle_style    	harmonic
 dihedral_style 	multi/harmonic
 improper_style	harmonic
 
-pair_coeff      1 1 0.093 3.93 10
-pair_coeff      1 2 0.145 3.93 10
-pair_coeff      1 3 0.086 3.87 10
-pair_coeff      2 2 0.227 3.93 10
-pair_coeff      2 3 0.134 3.87 10
-pair_coeff      3 3 0.080 3.81 10
+pair_coeff     	1 1 0.093 3.93 10
+pair_coeff     	1 2 0.145 3.93 10
+pair_coeff     	1 3 0.145 3.93 10
+pair_coeff     	1 4 0.086 3.87 10
+pair_coeff     	2 2 0.227 3.93 10
+pair_coeff     	2 3 0.227 3.93 10
+pair_coeff     	2 4 0.134 3.87 10
+pair_coeff     	3 3 0.227 3.93 10
+pair_coeff     	3 4 0.134 3.87 10
+pair_coeff     	4 4 0.080 3.81 10
 
 bond_coeff      1 448.126 1.54
 angle_coeff     1 62.14 114
@@ -59,7 +62,6 @@ dihedral_coeff 	2 0.814 -1.792 0.389 3.673 0
 improper_coeff	1 40 27.25
 
 timestep       	1
-
 fix	       	ensemble all nve
 fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
 fix		compress all deform 1 x scale ${scalefactor} y scale ${scalefactor} z scale ${scalefactor}	# the scalefactor is computed offline based on the final density of phase 1 and target density ## VIA BASH
@@ -72,7 +74,7 @@ dump_modify    	gphase2 first yes
 dump_modify    	gphase2 scale no
 run            	1000000	# this process of compressing to adjust to the final density is performed slowly so as to not "shock" the system
 undump         	gphase2
-write_restart  	restart_files/star.gphase2.*
+write_restart  	restart_files/sql.gphase2.*
 unfix		ensemble
 unfix 		thermostat
 unfix		compress

@@ -11,7 +11,7 @@ variable	scalefactor equal 0.99829968553
 variable       	Nmol equal 125
 variable       	eqmT equal 293
 variable       	eqmP equal 0.987	# in atm; note 0.1MPa = 0.987 atm
-variable 	Pout equal 0.1		# in MPa
+variable       	Pout equal 0.1		# in MPa
 
 variable        pxx equal pxx
 variable        pyy equal pyy
@@ -81,7 +81,7 @@ unfix		compress
 # set the desired pressure & compute average density at that pressure
 
 fix 		barostat all npt temp ${eqmT} ${eqmT} 100.0 iso ${eqmP} ${eqmP} 1000.0
-fix             dave all ave/time 10 100 1000 v_rho ave running file outfiles/eqm.density.out
+fix 		dave all ave/time 10 100 1000 v_rho ave running file outfiles/eqm.density.out
 thermo		10000
 thermo_style   	custom step temp vol press density pe etotal
 run		1000000		# 1 nanoseconds
