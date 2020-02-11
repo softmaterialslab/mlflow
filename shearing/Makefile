@@ -3,13 +3,16 @@
 #make run-local-serial LAMMPS_EXE=lmp_g++ S=1e10 F=1000
 #make submit S=1e10 F=1000
 
-JOBSCR = squalane.shear.pbs
-LAMMPS_IN = in.squalane.shear
+JOBSCR = shear.pbs
+JOBSCR_bigred3 = bigred3shear.pbs
+LAMMPS_IN = in.shear
 S=1e10 
 F=100 
 NODESIZE=4
 MPI_EXE=mpirun
 LAMMPS_EXE=lmp_g++
+CLUSTER=bigred3
+M=T
 
 create-dirs:
 	@echo "Checking and creating needed sub-directories"
@@ -20,12 +23,20 @@ create-dirs:
 run-preprocessor:
 	@echo "Running the preprocessor to create lammps script."
 	chmod +x shell_scripts/pre.processing.sh
-	cd shell_scripts && ./pre.processing.sh -S $(S) -F $(F) && cd ..
+	cd shell_scripts && bash ./pre.processing.sh -M $(M) -S $(S) -F $(F) && cd ..
 	@echo "Running the preprocessor is over."
 
 submit: create-dirs run-preprocessor
+ifeq ($(CLUSTER),bigred3)
+	cp jobscripts/$(JOBSCR_bigred3) .
+	@echo "Launching the job"
+	sbatch $(JOBSCR_bigred3)
+else ifeq ($(DIR_PATH),bigred200)
+	cp jobscripts/$(JOBSCR) .
 	@echo "Launching the job"
 	qsub $(JOBSCR)
+endif
+	@echo "Job submitted to $(CLUSTER)";	
 
 local-run-parallel: create-dirs run-preprocessor
 	@echo "Running the job. "
