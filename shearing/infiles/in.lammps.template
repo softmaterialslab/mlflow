@@ -1,6 +1,6 @@
 # THIS IS A LAMMPS FILE TO SHEAR SQUALANE
 # Major update times:
-# 2019.07.25: RNN 1
+# 2020.02.11: updated to LAMMPS 2019
 
 #--------------------------------RESTART------------------------------------#
 variable       	eqmT equal 293
@@ -11,10 +11,12 @@ variable       	volume      equal vol
 
 variable       	dumpstep	equal USER-F-USER
 
-molecule       	SQL infiles/UA.MG.SQL.txt
-atom_style     	template SQL
+#molecule       	SQL infiles/UA.MG.SQL.txt
+#atom_style     	template SQL
+atom_style	molecular
 	
-read_restart   	restart_files/sql.expt.P0.1MPa.*
+read_restart   	restart_files/USER-R-USER.T293K.P0.1MPa.*
+
 neighbor       	0.3 bin
 neigh_modify   	every 1 delay 0 check yes
 
@@ -38,7 +40,7 @@ fix             shear2 all deform 1 xy erate ${srate} remap v units box
 #thermo_modify	press ptilt
 #thermo_style   custom step time temp vol press density pe etotal pxx pyy pzz pxy pyz pxz c_myT
 #run            1000000
-#write_restart  restart_files/shear.sql.*
+#write_restart  restart_files/shear.USER-R-USER.*
 
 compute			myP all pressure NULL virial
 variable        strain equal ${srate}*dt*step
@@ -56,12 +58,12 @@ thermo_style    custom step v_dummytime temp vol press density pe etotal pxx pyy
 thermo_modify	temp tilt
 thermo_modify	press ptilt
 dump            intra all custom ${dumpstep} data/data.rg.all.* id mol type mass xu yu zu vx vy vz
-dump            movie all atom ${dumpstep} outfiles/nvt.shear.squalane.atom
+dump            movie all atom ${dumpstep} outfiles/nvt.shear.USER-R-USER.atom
 
 run             10000000
-write_restart   restart_files/shear.sql.*
+write_restart   restart_files/shear.USER-R-USER.*
 run             10000000
-write_restart   restart_files/shear.sql.*
+write_restart   restart_files/shear.USER-R-USER.*
 
 unfix 			shear1
 unfix 			shear2

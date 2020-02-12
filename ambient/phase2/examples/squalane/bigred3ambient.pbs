@@ -3,7 +3,7 @@
 #SBATCH --mail-user=kadu@iu.edu
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=48
-#SBATCH --time=0-0:30:00
+#SBATCH --time=0-1:00:00
 #SBATCH --partition=general
 #SBATCH --mail-type=FAIL,BEGIN,END
 #SBATCH --job-name=phase2
@@ -16,7 +16,7 @@ module load lammps/gnu
 
 ######  Job commands go below this line #####
 cd $SLURM_SUBMIT_DIR
-time srun -n 64 lmp_mpi < in.ambient
+time srun -n 96 lmp_mpi < in.ambient
 
 
 
