@@ -29,7 +29,7 @@ Subtext: need to see if unsupervised ML can classify features in a complex molec
     * For squalane: ```make DIR_PATH=SHEAR METHOD=submit M=S CLUSTER=bigred3```
     * For star molecule:  ```make DIR_PATH=SHEAR METHOD=submit M=T CLUSTER=bigred3```
 * If you want to clean the project:
- ```make clean DIR_PATH=SHEAR``
+ ```make clean DIR_PATH=SHEAR```
 
 ## Installing and running ambient sample on local computer
 * For running different phases of the program: please check bigred3 commands and change local make commands accordingly.
