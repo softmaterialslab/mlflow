@@ -9,7 +9,7 @@
 #make DIR_PATH=AMB_P1 METHOD=local-run-serial M=S LAMMPS_EXE=lmp_daily
 #make DIR_PATH=AMB_P1 METHOD=submit M=S CLUSTER=bigred3
 #make DIR_PATH=AMB_P2 METHOD=submit M=S CLUSTER=bigred3
-#make DIR_PATH=SHEAR METHOD=local-run-parallel M=S NODESIZE=4 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily M=S S=1e10 F=1000
+#make DIR_PATH=SHEAR METHOD=local-run-parallel M=S NODESIZE=4 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily S=1e10 F=1000
 #make DIR_PATH=SHEAR METHOD=submit M=S S=1e10 F=1000 CLUSTER=bigred3 
 
 #Cleaning
@@ -38,9 +38,11 @@ all:
 ifeq ($(M),T)
 	@echo "STAR molecule is selected";
 	export RESTART_FILE_1=star.gphase1.*
+	export RESTART_FILE_2=star.T*
 else ifeq ($(M),S)
 	@echo "SQUALANE molecule is selected";
 	export RESTART_FILE_1=sql.gphase1.*
+	export RESTART_FILE_2=sql.T*
 endif
 
 ifeq ($(DIR_PATH),AMB_P1)
