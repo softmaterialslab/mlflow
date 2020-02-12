@@ -23,6 +23,14 @@ Subtext: need to see if unsupervised ML can classify features in a complex molec
 * If you want to clean the project:
  ```make clean DIR_PATH=AMB_P2```
 
+### Shearing
+* You must have restart file from phase2 to start the shearing process
+* Then, submit the job:
+    * For squalane: ```make DIR_PATH=SHEAR METHOD=submit M=S CLUSTER=bigred3```
+    * For star molecule:  ```make DIR_PATH=SHEAR METHOD=submit M=T CLUSTER=bigred3```
+* If you want to clean the project:
+ ```make clean DIR_PATH=SHEAR```
+
 ## Installing and running ambient sample on local computer
 * For running different phases of the program: please check bigred3 commands and change local make commands accordingly.
 * First, git clone the project:
