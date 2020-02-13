@@ -11,8 +11,14 @@ variable       	volume      equal vol
 
 variable       	dumpstep    equal USER-F-USER
 variable       	dumpstep2   equal ${dumpstep}/10
-variable       	dumpstep3   equal ${dumpstep}/100
+variable       	dumpstep3   equal 10 #${dumpstep}/dumpstep2
 variable       	dumpstep4   equal ${dumpstep}*10
+
+#Nevery=dumpstep3, Nrepeat=dumpstep2, and Nfreq=dumpstep;   Nevery*Nrepeat <= Nfreq
+#example Nevery=2, Nrepeat=6, Nfreq=100
+# Nfreq=100: Means every 100th step there willbe average
+# Nrepeat=6:  Means 90, 92, 94, 96, 98, 100
+# Nevery=2: Means gap between 90,92 and so on
 
 atom_style	molecular
 

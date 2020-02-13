@@ -1,0 +1,89 @@
+LAMMPS (09 Jan 2020)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:93)
+  using 1 OpenMP thread(s) per MPI task
+# THIS IS A LAMMPS FILE TO SHEAR SQUALANE
+# Major update times:
+# 2020.02.11: updated to LAMMPS 2019
+
+#--------------------------------RESTART------------------------------------#
+variable       	eqmT equal 293
+variable       	temperature equal temp
+variable       	massdensity equal density
+variable       	pressure    equal press
+variable       	volume      equal vol
+
+variable       	dumpstep    equal 500
+variable       	dumpstep2   equal ${dumpstep}/10
+variable       	dumpstep2   equal 500/10
+variable       	dumpstep3   equal 10 #${dumpstep}/dumpstep2
+variable       	dumpstep4   equal ${dumpstep}*10
+variable       	dumpstep4   equal 500*10
+
+#Nevery=dumpstep3, Nrepeat=dumpstep2, and Nfreq=dumpstep;   Nevery*Nrepeat <= Nfreq
+#example Nevery=2, Nrepeat=6, Nfreq=100
+# Nfreq=100: Means every 100th step there willbe average
+# Nrepeat=6:  Means 90, 92, 94, 96, 98, 100
+# Nevery=2: Means gap between 90,92 and so on
+
+atom_style	molecular
+
+read_restart   	restart_files/sql.T293K.P0.1MPa.*
+WARNING: Restart file used different # of processors: 96 vs. 4 (src/read_restart.cpp:742)
+  restoring atom style molecular from restart
+  triclinic box = (111.251 111.251 111.251) to (158.749 158.749 158.749) with tilt (0 0 0)
+  1 by 2 by 2 MPI processor grid
+  restoring pair style lj/cut from restart
+  restoring bond style harmonic from restart
+  restoring angle style harmonic from restart
+  restoring dihedral style multi/harmonic from restart
+  restoring improper style harmonic from restart
+  3750 atoms
+  3625 bonds
+  4250 angles
+  3875 dihedrals
+  750 impropers
+  3 = max # of 1-2 neighbors
+  3 = max # of 1-3 neighbors
+  6 = max # of 1-4 neighbors
+  8 = max # of special neighbors
+  special bonds CPU = 0.001031 secs
+  read_restart CPU = 0.0068702 secs
+
+neighbor       	0.3 bin
+neigh_modify   	every 1 delay 0 check yes
+
+variable	dummystep equal step
+timestep       	1
+reset_timestep	0
+variable	dummytime equal step*dt
+
+variable 	exptsrate equal 1e9		# 1e10 , 1e9, 1e8, 1e7
+variable        srate equal ${exptsrate}/1e15		#0.00001 = 1e10, 0.000001 = 1e9, 0.0000001 = 1e8, 0.00000001 = 1e7, 0.000000001 = 1e6
+variable        srate equal 1000000000/1e15		
+variable        runstep equal (10/${srate})/5 		#
+variable        runstep equal (10/1e-06)/5 		
+
+compute         myT all temp
+compute		tilt all temp/deform
+compute		ptilt all pressure tilt
+fix             shear1 all nvt/sllod temp ${eqmT} ${eqmT} 100.0 tchain 1
+fix             shear1 all nvt/sllod temp 293 ${eqmT} 100.0 tchain 1
+fix             shear1 all nvt/sllod temp 293 293 100.0 tchain 1
+fix             shear2 all deform 1 xy erate ${srate} remap v units box
+fix             shear2 all deform 1 xy erate 1e-06 remap v units box
+
+compute		myP all pressure NULL virial
+variable        strain equal ${srate}*dt*step
+variable        strain equal 1e-06*dt*step
+variable        stress equal (-1)*c_ptilt[4]
+variable        h1 equal c_ptilt[1]
+variable        h2 equal c_ptilt[2]
+variable        h3 equal c_ptilt[3]
+fix             ssave all ave/time ${dumpstep3} ${dumpstep2} ${dumpstep} v_strain v_stress ave one file outfiles/strain.stress.out	#10, 20, ..., 100, ..., 910, 920, ... 1000
+fix             ssave all ave/time 10 ${dumpstep2} ${dumpstep} v_strain v_stress ave one file outfiles/strain.stress.out	
+fix             ssave all ave/time 10 50 ${dumpstep} v_strain v_stress ave one file outfiles/strain.stress.out	
+fix             ssave all ave/time 10 50 500 v_strain v_stress ave one file outfiles/strain.stress.out	
+fix             pressave all ave/time ${dumpstep3} ${dumpstep2} ${dumpstep} v_strain v_h1 v_h2 v_h3 ave one file outfiles/pressure.out
+fix             pressave all ave/time 10 ${dumpstep2} ${dumpstep} v_strain v_h1 v_h2 v_h3 ave one file outfiles/pressure.out
+fix             pressave all ave/time 10 50 ${dumpstep} v_strain v_h1 v_h2 v_h3 ave one file outfiles/pressure.out
+fix             pressave all ave/time 10 50 500 v_strain v_h1 v_h2 v_h3 ave one file outfil
