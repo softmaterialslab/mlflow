@@ -36,5 +36,5 @@ echo "Selected modecular model = $M"
 cat ../infiles/in.lammps.template | \
 sed -e 's/USER-S-USER/'$S'/g' | \
 sed -e 's/USER-F-USER/'$F'/g' | \
-sed -e 's/USER-R-USER/'$M'/g' > ../in.shear
+sed -e 's/USER-M-USER/'$M'/g' > ../in.shear
 
