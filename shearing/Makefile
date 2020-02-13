@@ -1,11 +1,12 @@
 #Example runs
-#make run-local-parallel MPI_EXE=mpirun LAMMPS_EXE=lmp_g++ S=1e10 F=1000
-#make run-local-serial LAMMPS_EXE=lmp_g++ S=1e10 F=1000
-#make submit S=1e10 F=1000
+#make run-local-parallel MPI_EXE=mpirun LAMMPS_EXE=lmp_g++ P=0.1 S=1e10 F=1000
+#make run-local-serial LAMMPS_EXE=lmp_g++ P=0.1 S=1e10 F=1000
+#make submit P=0.1 S=1e10 F=1000
 
 JOBSCR = shear.pbs
 JOBSCR_bigred3 = bigred3shear.pbs
 LAMMPS_IN = in.shear
+P=0.1
 S=1e10 
 F=100 
 NODESIZE=4
@@ -23,7 +24,7 @@ create-dirs:
 run-preprocessor:
 	@echo "Running the preprocessor to create lammps script."
 	chmod +x shell_scripts/pre.processing.sh
-	cd shell_scripts && bash ./pre.processing.sh -M $(M) -S $(S) -F $(F) && cd ..
+	cd shell_scripts && bash ./pre.processing.sh -P $(P) -M $(M) -S $(S) -F $(F) && cd ..
 	@echo "Running the preprocessor is over."
 
 submit: create-dirs run-preprocessor
