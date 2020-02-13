@@ -26,8 +26,8 @@ Subtext: need to see if unsupervised ML can classify features in a complex molec
 ### Shearing
 * You must have restart file from phase2 to start the shearing process
 * Select F and S to change below to what is needed. Then, submit the job:
-    * For squalane: ```make DIR_PATH=SHEAR S=1e10 F=1000 METHOD=submit M=S CLUSTER=bigred3```
-    * For star molecule:  ```make DIR_PATH=SHEAR S=1e10 F=1000 METHOD=submit M=T CLUSTER=bigred3```
+    * For squalane: ```make DIR_PATH=SHEAR METHOD=submit M=S P =0.1 S=1e10 F=1000 CLUSTER=bigred3```
+    * For star molecule:  ```make DIR_PATH=SHEAR METHOD=submit M=T P =0.1 S=1e10 F=1000 CLUSTER=bigred3```
 * If you want to clean the project:
  ```make clean DIR_PATH=SHEAR```
 

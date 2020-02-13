@@ -15,8 +15,8 @@ variable       	dumpstep3   equal ${dumpstep}/100
 variable       	dumpstep4   equal ${dumpstep}*10
 
 atom_style	molecular
-	
-read_restart   	restart_files/USER-M-USER.T293K.P0.1MPa.*
+
+read_restart   	restart_files/USER-M-USER.T293K.PUSER-P-USERMPa.*
 
 neighbor       	0.3 bin
 neigh_modify   	every 1 delay 0 check yes
