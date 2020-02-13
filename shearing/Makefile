@@ -51,9 +51,11 @@ clean: dataclean
 
 dataclean:
 	rm -f outfiles/*
+	rm -f restart_files/*
 	rm -f data/*	
 	rm -f *.lammps
 	rm -f *.log
 	rm -f *.in
+	rm -f *.pbs
 
 .PHONY: clean dataclean run-preprocessor create-dirs
