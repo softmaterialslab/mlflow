@@ -83,15 +83,17 @@ unfix 		thermostat
 unfix		compress
 
 #### NEW NVT SIMULATION
-fix             diffuse all nvt temp ${eqmT} ${eqmT} 100.0
-thermo		10000
+fix				diffuse all nvt temp ${eqmT} ${eqmT} 100.0
+thermo			10000
 thermo_style   	custom step temp vol press density pe etotal
-run		5000000		# 5 nanoseconds
+run				5000000		# 5 nanoseconds
 
-thermo		10000
-run		50000000	# 50 nanoseconds
-thermo		10000
-run		50000000	# 50 nanoseconds
+thermo			10000
+run				50000000	# 50 nanoseconds
+thermo			10000
+run				50000000	# 50 nanoseconds
+
+unfix			diffuse
 
 ####
 
