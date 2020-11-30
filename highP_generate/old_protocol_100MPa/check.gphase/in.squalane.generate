@@ -1,0 +1,80 @@
+# THIS IS A LAMMPS FILE TO GENERATE SQUALANE IN A BOX
+# Major update times:
+# 2014.11.18: Creation
+# 2014.12.05: fix deposit or create atoms single investigation
+# 2015.02.02: new template. including 2 dihedral types, more faithful to MG
+# 2015.06.06: impropers in
+
+molecule       	SQL UA.JORGENSEN.MG.SQL.txt
+atom_style     	template SQL
+
+variable       	Nmol equal 125
+variable       	eqmT equal 293
+variable       	eqmP equal 987	# 0.1MPa = 0.987 atm
+variable	Pout equal 100
+variable        pxx equal pxx
+variable        pyy equal pyy
+variable        pzz equal pzz
+variable        pxy equal pxy
+variable        pxz equal pxz
+variable        pyz equal pyz
+variable	a equal cella
+variable 	b equal cellb
+variable 	c equal cellc
+variable 	rho equal density
+variable 	vol equal vol
+variable 	etotal equal etotal
+
+read_restart	sql.T${eqmT}K.P${Pout}MPa.*		
+neighbor       	0.3 bin
+neigh_modify   	every 1 delay 0 check yes
+
+# from Mondello & Grest (1995) JCP 103, 7156: model A 
+# from Moore et al (Cummings group) (2000) JCP 113, 8833
+mass           	1 14.026		
+mass           	2 15.034
+mass           	3 15.034
+mass           	4 13.018
+
+pair_style     	lj/cut 10			# MG do not say if cutoffs obey BL rules
+pair_modify    	shift yes			# MG do not really mention if LJ is shifted in their above cited paper, they do so in a follow-up paper. 
+special_bonds  	lj 0.0 0.0 0.0
+	
+bond_style     	harmonic
+angle_style    	harmonic
+dihedral_style 	multi/harmonic
+improper_style	harmonic
+
+pair_coeff     	1 1 0.093 3.93 10
+pair_coeff     	1 2 0.145 3.93 10
+pair_coeff     	1 3 0.145 3.93 10
+pair_coeff     	1 4 0.086 3.87 10
+pair_coeff     	2 2 0.227 3.93 10
+pair_coeff     	2 3 0.227 3.93 10
+pair_coeff     	2 4 0.134 3.87 10
+pair_coeff     	3 3 0.227 3.93 10
+pair_coeff     	3 4 0.134 3.87 10
+pair_coeff     	4 4 0.080 3.81 10
+
+bond_coeff      1 448.126 1.54
+angle_coeff     1 62.14 114
+dihedral_coeff 	1 2.007 -4.012 0.271 6.290 0
+dihedral_coeff 	2 0.814 -1.792 0.389 3.673 0
+improper_coeff	1 40 27.25
+
+timestep       	1
+fix	       	ensemble all nve
+fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
+fix		compress all deform 1 x scale 1.00243436144 y scale 1.00243436144 z scale 1.00243436144
+fix		output_pressure all ave/time 10 100 1000 v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz c_thermo_press ave one file pressure.tensor.out
+fix 		state_variables all ave/time 10 100 1000 c_thermo_temp v_vol v_rho v_etotal v_a v_b v_c ave one file state.variables.out
+thermo         	1000
+thermo_style   	custom step temp vol press density pe etotal
+run            	1000000
+unfix		ensemble
+unfix 		thermostat
+unfix		compress
+
+write_restart  	sql.T${eqmT}K.P${Pout}MPa.*
+
+shell		sh cleanlog.sh
