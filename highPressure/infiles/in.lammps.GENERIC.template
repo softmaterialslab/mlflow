@@ -1,14 +1,14 @@
-# THIS IS A LAMMPS FILE TO GENERATE SQL UNDER HIGH P CONIDTIONS
+# THIS IS A LAMMPS FILE TO GENERATE V_MOLECULE_V UNDER HIGH P CONIDTIONS
 # one script should do for each P (take 100MPa): start from 0.1MPa state, deform to a density where P becomes close to expected value (100MPa), do NVT, do NPT, do another deform
 # density.pressure.out shared in benchmark should guide
 
 atom_style	molecular
 
-variable	scalefactor equal #NEEDS TO BE SET BASED ON A GOOD VALUE to GET 100MPa from 0.1 MPA # scalefactor=(rho_input/rho_target)^(1/3)
+variable	scalefactor equal V_SCALEFAC_V #NEEDS TO BE SET BASED ON A GOOD VALUE to GET 100MPa from 0.1 MPA # scalefactor=(rho_input/rho_target)^(1/3); scalefactor=(0.81843211/0.867)^(1/3)=0.98096727779 
 variable       	Nmol equal 125
 variable       	eqmT equal 293
-variable       	eqmP equal 987	# in atm; CHANGE to desired P; note 0.1MPa = 0.987 atm
-variable       	Pout equal 100 	# in MPa (CHANGE to desired P)
+variable       	Pout equal V_POUT_V	# in MPa (CHANGE to desired P)
+variable       	eqmP equal ${Pout}*0.987 	# in atm; CHANGE to desired P; note 0.1MPa = 0.987 atm
 
 variable        pxx equal pxx
 variable        pyy equal pyy
@@ -23,7 +23,7 @@ variable 	rho equal density
 variable 	vol equal vol
 variable 	etotal equal etotal
 
-read_restart	restart_files/STATE_AT_AMBIENT.*	# note that this sample was produced at 0.1MPa
+read_restart	restart_files/V_MOLECULE_V.T293K.PV_PIN_VMPa.*	# note that this sample was produced at V_PIN_VMPa
 neighbor       	0.3 bin
 neigh_modify   	every 1 delay 0 check yes
 
@@ -64,26 +64,24 @@ timestep       	1
 
 fix	       	ensemble all nve
 fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
-fix		compress all deform 1 x scale ${scalefactor} y scale ${scalefactor} z scale ${scalefactor}	# the scalefactor is computed offline based on the final density of AMBIENT and target density ## VIA BASH
+fix		compress all deform 1 x scale ${scalefactor} y scale ${scalefactor} z scale ${scalefactor}	# the scalefactor is computed offline based on the final density of phase 1 and target density ## VIA BASH
 fix		output_pressure all ave/time 10 100 1000 v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz c_thermo_press ave one file outfiles/pressure.tensor.out
 fix 		state_variables all ave/time 10 100 1000 c_thermo_temp v_vol v_rho v_etotal v_a v_b v_c ave one file outfiles/state.variables.out
 thermo         	1000
 thermo_style   	custom step temp vol press density pe etotal
-dump           	gphase2 all atom 50000 outfiles/dumpgphase2.atom	# about 10 MB movie will be generated, change the 10000 to something else if smaller size is needed
+dump           	gphase2 all atom 50000 outfiles/dumpgphase2.atom	# about 10 MB movie will be generated, change the 50000 to something else if smaller size is needed
 dump_modify    	gphase2 first yes
 dump_modify    	gphase2 scale no
 run            	5000000	# this process of compressing to adjust to the final density is performed slowly so as to not "shock" the system
 undump         	gphase2
-write_restart  	restart_files/sql.gphase2.*
+write_restart  	restart_files/V_MOLECULE_V.gphase2.*
 unfix		ensemble
 unfix 		thermostat
 unfix		compress
 
 #### do NVT to equilibrate
 fix		diffuse all nvt temp ${eqmT} ${eqmT} 100.0
-
 thermo_style   	custom step temp vol press density pe etotal
-
 thermo		10000
 run		5000000		# 5 nanoseconds
 
@@ -106,11 +104,12 @@ thermo		10000
 thermo_style   	custom step temp vol press density pe etotal
 run		5000000		# 5 nanoseconds; I increased this to be safe to project to 1000X increase in pressure from ambient to 100MPa; could lower if going from 100MPa to 200MPa, an so on
 unfix		barostat
-write_restart  	restart_files/sql.barostat.*
+write_restart  	restart_files/V_MOLECULE_V.barostat.*
 
 # find the adjustment factor needed to bring rho to the new average rho (target) 
 variable        averho equal f_dave
 variable        adjustrho equal (${rho}/${averho})^(1.0/3.0)
+unfix        dave
 
 # adjusting to the average rho; pressure would change (slightly)
 fix             ensemble all nve
@@ -123,4 +122,4 @@ unfix           ensemble
 unfix           thermostat
 unfix           adjust
 
-write_restart   restart_files/sql.T${eqmT}K.P${Pout}MPa.*
+write_restart   restart_files/V_MOLECULE_V.T${eqmT}K.P${Pout}MPa.*
