@@ -70,7 +70,7 @@ else ifeq ($(DIR_PATH),HP)
 ifeq ($(E),0.1)
 	if ! test -f $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need phase2 restart file: $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* to start HP simulation"; exit 1; fi
 	@echo "Copying restart files from phase2 to HP folder";
-	cp -r $(AMB)/phase2/restart_files $(HP)/restart_files
+	cp -r $(AMB)/phase2/restart_files $(HP)/
 else
 	if ! test -f $(HP)/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need the restart: $(HP)/phase2/restart_files/$(T).T293K.P$(E)MPa.* to start HP simulation"; exit 1; fi
 endif

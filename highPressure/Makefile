@@ -15,7 +15,7 @@ P=0.1
 
 JOBSCR = highPressure.pbs
 JOBSCR_bigred3 = bigred3highPressure.pbs
-LAMMPS_IN = in.highPressure
+LAMMPS_IN = in.highP
 M=T
 NODESIZE=4
 MPI_EXE=mpirun
