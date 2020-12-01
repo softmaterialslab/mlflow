@@ -22,6 +22,13 @@ Subtext: need to see if unsupervised ML can classify features in a complex molec
     * For star molecule:  ```make DIR_PATH=AMB_P2 METHOD=submit M=T CLUSTER=bigred3```
 * If you want to clean the project:
  ```make clean DIR_PATH=AMB_P2```
+ 
+### High pressure sample generation
+* You must have restart file from 0.1MPa-phase2 to run the 100MPa
+* Then, submit the job:
+    * For squalane: ```make DIR_PATH=HP METHOD=submit CLUSTER=bigred3 M=S T=sql P=100 E=0.1 R=0.81843211 O=0.867```
+* If you want to clean the project:
+ ```make clean DIR_PATH=HP```
 
 ### Shearing
 * You must have restart file from phase2 to start the shearing process
