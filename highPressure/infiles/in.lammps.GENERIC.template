@@ -22,6 +22,7 @@ variable 	c equal cellc
 variable 	rho equal density
 variable 	vol equal vol
 variable 	etotal equal etotal
+variable 	pressure equal press
 
 read_restart	restart_files/V_MOLECULE_V.T293K.PV_PIN_VMPa.*	# note that this sample was produced at V_PIN_VMPa
 neighbor       	0.3 bin
@@ -124,7 +125,7 @@ unfix           adjust
 
 #### do NVT to equilibrate more and compute average P
 fix		NVTgetP all nvt temp ${eqmT} ${eqmT} 100.0
-fix 		pave all ave/time 10 100 1000 v_press ave running file outfiles/eqm.press.out
+fix 		pave all ave/time 10 100 1000 v_pressure ave running file outfiles/eqm.press.out
 thermo_style   	custom step temp vol press density pe etotal
 thermo		10000
 run		5000000		# 5 nanoseconds
