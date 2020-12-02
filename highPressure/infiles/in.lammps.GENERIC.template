@@ -99,10 +99,10 @@ unfix		diffuse
 # set the desired pressure & compute average density at that pressure
 
 fix 		barostat all npt temp ${eqmT} ${eqmT} 100.0 iso ${eqmP} ${eqmP} 1000.0
-fix 		dave all ave/time 10 100 1000 v_rho ave running file outfiles/eqm.density.out
+fix 		dave all ave/time 10 100 1000 v_rho ave running file outfiles/eqm.density.out 	# is this a good averaging process?
 thermo		10000
 thermo_style   	custom step temp vol press density pe etotal
-run		5000000		# 5 nanoseconds; I increased this to be safe to project to 1000X increase in pressure from ambient to 100MPa; could lower if going from 100MPa to 200MPa, an so on
+run		50000000		# 50 nanoseconds to get better density; I increased this to be safe to project to 1000X increase in pressure from ambient to 100MPa; could lower if going from 100MPa to 200MPa, an so on
 unfix		barostat
 write_restart  	restart_files/V_MOLECULE_V.barostat.*
 
@@ -121,5 +121,15 @@ run             1000000		# 1 nanoseconds
 unfix           ensemble
 unfix           thermostat
 unfix           adjust
+
+#### do NVT to equilibrate more and compute average P
+fix		NVTgetP all nvt temp ${eqmT} ${eqmT} 100.0
+fix 		pave all ave/time 10 100 1000 v_press ave running file outfiles/eqm.press.out
+thermo_style   	custom step temp vol press density pe etotal
+thermo		10000
+run		5000000		# 5 nanoseconds
+
+unfix		NVTgetP
+unfix		pave
 
 write_restart   restart_files/V_MOLECULE_V.T${eqmT}K.P${Pout}MPa.*
