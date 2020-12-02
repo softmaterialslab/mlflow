@@ -1,3 +1,5 @@
+#9-n-octyldocosane
+2020.12.02: this is the molecule to probe next. It is C30H62 and an isomer of squalane. Has diff architecture so gives the challenge for dim red methods. Generation will occur first in 313K and 0.1MPa. Moore JCP with Cummings is a good paper to start.
 # nonadecane
 Simulating nonadecane: generation and shear
 Subtext: need to see if unsupervised ML can classify features in a complex molecular fluid
