@@ -15,6 +15,7 @@
 
 #Examples for SQL different pressure sample generation
 #make DIR_PATH=HP METHOD=submit CLUSTER=bigred3 M=S T=sql P=100 E=0.1 R=0.81843211 O=0.867
+#make DIR_PATH=HP METHOD=submit CLUSTER=bigred3 M=S T=sql P=300 E=100 R=0.86715711 O=0.923
 #make DIR_PATH=HP METHOD=local-run-serial LAMMPS_EXE=lmp_daily M=S T=sql P=100 E=0.1 R=0.81843211 O=0.867
 #make DIR_PATH=HP METHOD=local-run-parallel NODESIZE=4 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily M=S T=sql P=100 E=0.1 R=0.81843211 O=0.867
 
@@ -71,11 +72,11 @@ else ifeq ($(DIR_PATH),AMB_P2)
 else ifeq ($(DIR_PATH),HP)
 	@echo "Searching for $(T).T293K.P$(E)MPa.* restart file";
 ifeq ($(E),0.1)
-	if ! test -f $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need phase2 restart file: $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* to start HP simulation"; exit 1; fi
+	if ! test -f $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need phase2 restart file: $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* to start HP simulation for $(P)MPa"; exit 1; fi
 	@echo "Copying restart files from phase2 to HP folder";
 	cp -r $(AMB)/phase2/restart_files $(HP)/
 else
-	if ! test -f $(HP)/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need the restart: $(HP)/phase2/restart_files/$(T).T293K.P$(E)MPa.* to start HP simulation"; exit 1; fi
+	if ! test -f $(HP)/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need the restart file: $(HP)/restart_files/$(T).T293K.P$(E)MPa.* to start HP simulation for $(P)MPa"; exit 1; fi
 endif
 	+$(MAKE) -C $(HP) $(METHOD) M=$(M) P=$(P) R=$(R) O=$(O) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER) RESTART_FILE_HP=$(T).T293K.P$(E)MPa.*
 else ifeq ($(DIR_PATH),SHEAR)
