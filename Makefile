@@ -79,9 +79,15 @@ endif
 	+$(MAKE) -C $(HP) $(METHOD) M=$(M) P=$(P) R=$(R) O=$(O) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER) RESTART_FILE_HP=$(T).T293K.P$(E)MPa.*
 else ifeq ($(DIR_PATH),SHEAR)
 	@echo "Searching for $(RESTART_FILE_2) restart file";
-	if ! test -f $(AMB)/phase2/restart_files/$(RESTART_FILE_2) ; then echo "You need phase1 restart file in $(AMB)/phase2/restart_files/$(RESTART_FILE_2) folder to start shearing"; exit 1; fi
+ifeq ($(P),0.1)
+	if ! test -f $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need phase1 restart file $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* to start shearing"; exit 1; fi
 	@echo "Copying restart files from phase2 to shearing folder";
 	cp -r $(AMB)/phase2/restart_files $(SHEAR)/
+else
+	if ! test -f $(HP)/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need phase1 restart file $(HP)/restart_files/$(T).T293K.P$(E)MPa.* to start shearing"; exit 1; fi
+	@echo "Copying restart files from $(HP)/restart_files to shearing folder";
+	cp -r $(HP)/restart_files $(SHEAR)/
+endif
 	+$(MAKE) -C $(SHEAR)/ $(METHOD) M=$(M) P=$(P) S=$(S) F=$(F) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER)
 else
 	@echo "Build path is not selected";
