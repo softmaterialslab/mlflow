@@ -81,11 +81,11 @@ endif
 else ifeq ($(DIR_PATH),SHEAR)
 	@echo "Searching for $(T).T293K.P$(P)MPa.* restart file";
 ifeq ($(P),0.1)
-	if ! test -f $(AMB)/phase2/restart_files/$(T).T293K.P$(P)MPa.* ; then echo "You need phase1 restart file $(AMB)/phase2/restart_files/$(T).T293K.P$(P)MPa.* to start shearing"; exit 1; fi
+	if ! test -f $(AMB)/phase2/restart_files/$(T).T293K.P$(P)MPa.* ; then echo "You need phase2 restart file $(AMB)/phase2/restart_files/$(T).T293K.P$(P)MPa.* to start shearing"; exit 1; fi
 	@echo "Copying restart files from phase2 to shearing folder";
 	cp -r $(AMB)/phase2/restart_files $(SHEAR)/
 else
-	if ! test -f $(HP)/restart_files/$(T).T293K.P$(P)MPa.* ; then echo "You need phase1 restart file $(HP)/restart_files/$(T).T293K.P$(P)MPa.* to start shearing"; exit 1; fi
+	if ! test -f $(HP)/restart_files/$(T).T293K.P$(P)MPa.* ; then echo "You need high pressure restart file $(HP)/restart_files/$(T).T293K.P$(P)MPa.* to start shearing"; exit 1; fi
 	@echo "Copying restart files from $(HP)/restart_files to shearing folder";
 	cp -r $(HP)/restart_files $(SHEAR)/
 endif
