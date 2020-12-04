@@ -16,6 +16,7 @@
 #Examples for SQL different pressure sample generation
 #make DIR_PATH=HP METHOD=submit CLUSTER=bigred3 M=S T=sql P=100 E=0.1 R=0.81843211 O=0.867
 #make DIR_PATH=HP METHOD=submit CLUSTER=bigred3 M=S T=sql P=300 E=100 R=0.86715711 O=0.923
+#make DIR_PATH=HP METHOD=submit CLUSTER=bigred3 M=S T=sql P=400 E=100 R=0.86715711 O=0.942
 #make DIR_PATH=HP METHOD=local-run-serial LAMMPS_EXE=lmp_daily M=S T=sql P=100 E=0.1 R=0.81843211 O=0.867
 #make DIR_PATH=HP METHOD=local-run-parallel NODESIZE=4 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily M=S T=sql P=100 E=0.1 R=0.81843211 O=0.867
 
