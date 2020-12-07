@@ -73,7 +73,7 @@ thermo_style   	custom step temp vol press density pe etotal
 dump           	gphase2 all atom 50000 outfiles/dumpgphase2.atom	# about 10 MB movie will be generated, change the 50000 to something else if smaller size is needed
 dump_modify    	gphase2 first yes
 dump_modify    	gphase2 scale no
-run            	5000000	# this process of compressing to adjust to the final density is performed slowly so as to not "shock" the system
+run            	50000000	# this process of compressing to adjust to the final density is performed slowly so as to not "shock" the system #updated to 50ns
 undump         	gphase2
 write_restart  	restart_files/V_MOLECULE_V.gphase2.*
 unfix		ensemble
@@ -128,7 +128,7 @@ fix		NVTgetP all nvt temp ${eqmT} ${eqmT} 100.0
 fix 		pave all ave/time 10 100 1000 v_pressure ave running file outfiles/eqm.press.out
 thermo_style   	custom step temp vol press density pe etotal
 thermo		10000
-run		5000000		# 5 nanoseconds
+run		50000000		# 5 nanoseconds
 
 unfix		NVTgetP
 unfix		pave

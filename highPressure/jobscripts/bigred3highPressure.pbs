@@ -3,7 +3,7 @@
 #SBATCH --mail-user=kadu@iu.edu
 #SBATCH --nodes=4
 #SBATCH --ntasks-per-node=48
-#SBATCH --time=1-0:00:00
+#SBATCH --time=2-0:00:00
 #SBATCH --partition=general
 #SBATCH --mail-type=FAIL,BEGIN,END
 #SBATCH --job-name=highPressurePhase2
