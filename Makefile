@@ -10,10 +10,14 @@
 #make DIR_PATH=AMB_P1 METHOD=submit M=S CLUSTER=bigred3
 #make DIR_PATH=AMB_P2 METHOD=submit M=S CLUSTER=bigred3
 #make DIR_PATH=SHEAR METHOD=local-run-parallel NODESIZE=4 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily M=S P=0.1 S=1e10 F=1000
+#make DIR_PATH=SHEAR METHOD=local-run-serial MPI_EXE=mpirun LAMMPS_EXE=lmp_daily M=S P=100 S=1e10 F=1000
 #make DIR_PATH=SHEAR METHOD=submit M=S P =0.1 S=1e10 F=1000 CLUSTER=bigred3
 
 #Examples for SQL different pressure sample generation
 #make DIR_PATH=HP METHOD=submit CLUSTER=bigred3 M=S T=sql P=100 E=0.1 R=0.81843211 O=0.867
+#make DIR_PATH=HP METHOD=submit CLUSTER=bigred3 M=S T=sql P=300 E=100 R=0.86715711 O=0.923
+#make DIR_PATH=HP METHOD=submit CLUSTER=bigred3 M=S T=sql P=400 E=100 R=0.86715711 O=0.942
+#make DIR_PATH=HP METHOD=submit CLUSTER=bigred3 M=S T=sql P=636 E=400 R=0.94403833 O=0.979
 #make DIR_PATH=HP METHOD=local-run-serial LAMMPS_EXE=lmp_daily M=S T=sql P=100 E=0.1 R=0.81843211 O=0.867
 #make DIR_PATH=HP METHOD=local-run-parallel NODESIZE=4 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily M=S T=sql P=100 E=0.1 R=0.81843211 O=0.867
 
@@ -70,18 +74,24 @@ else ifeq ($(DIR_PATH),AMB_P2)
 else ifeq ($(DIR_PATH),HP)
 	@echo "Searching for $(T).T293K.P$(E)MPa.* restart file";
 ifeq ($(E),0.1)
-	if ! test -f $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need phase2 restart file: $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* to start HP simulation"; exit 1; fi
+	if ! test -f $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need phase2 restart file: $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* to start HP simulation for $(P)MPa"; exit 1; fi
 	@echo "Copying restart files from phase2 to HP folder";
 	cp -r $(AMB)/phase2/restart_files $(HP)/
 else
-	if ! test -f $(HP)/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need the restart: $(HP)/phase2/restart_files/$(T).T293K.P$(E)MPa.* to start HP simulation"; exit 1; fi
+	if ! test -f $(HP)/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need the restart file: $(HP)/restart_files/$(T).T293K.P$(E)MPa.* to start HP simulation for $(P)MPa"; exit 1; fi
 endif
 	+$(MAKE) -C $(HP) $(METHOD) M=$(M) P=$(P) R=$(R) O=$(O) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER) RESTART_FILE_HP=$(T).T293K.P$(E)MPa.*
 else ifeq ($(DIR_PATH),SHEAR)
-	@echo "Searching for $(RESTART_FILE_2) restart file";
-	if ! test -f $(AMB)/phase2/restart_files/$(RESTART_FILE_2) ; then echo "You need phase1 restart file in $(AMB)/phase2/restart_files/$(RESTART_FILE_2) folder to start shearing"; exit 1; fi
+	@echo "Searching for $(T).T293K.P$(P)MPa.* restart file";
+ifeq ($(P),0.1)
+	if ! test -f $(AMB)/phase2/restart_files/$(T).T293K.P$(P)MPa.* ; then echo "You need phase2 restart file $(AMB)/phase2/restart_files/$(T).T293K.P$(P)MPa.* to start shearing"; exit 1; fi
 	@echo "Copying restart files from phase2 to shearing folder";
 	cp -r $(AMB)/phase2/restart_files $(SHEAR)/
+else
+	if ! test -f $(HP)/restart_files/$(T).T293K.P$(P)MPa.* ; then echo "You need high pressure restart file $(HP)/restart_files/$(T).T293K.P$(P)MPa.* to start shearing"; exit 1; fi
+	@echo "Copying restart files from $(HP)/restart_files to shearing folder";
+	cp -r $(HP)/restart_files $(SHEAR)/
+endif
 	+$(MAKE) -C $(SHEAR)/ $(METHOD) M=$(M) P=$(P) S=$(S) F=$(F) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER)
 else
 	@echo "Build path is not selected";
