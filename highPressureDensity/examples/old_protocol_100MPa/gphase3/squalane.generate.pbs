@@ -1,0 +1,19 @@
+#!/bin/bash -l
+#SBATCH --job-name=makesql
+#SBATCH --time=1:0:0
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=48
+#SBATCH --partition=lrgmem
+#SBATCH --mem=120000MB
+#SBACTH --mail-type=end
+#SBATCH --mail-user=vjadhao1@jhu.edu
+ 
+ 
+# run your job
+ 
+module unload openmpi/intel/1.8.4
+ 
+module load mvapich2/2.1rc2
+module load lammps
+ 
+time mpiexec lmp_mpi -in in.squalane.generate
