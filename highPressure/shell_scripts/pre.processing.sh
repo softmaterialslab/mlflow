@@ -29,7 +29,7 @@ fi
 echo "Selected modecular model = $M"
 
 # Calculate variables
-V_SCALEFAC_V=$(awk 'BEGIN { print ((ARGV[1]/ARGV[2]) ** (1.0 / 3.0)) }' $R $O)
+V_SCALEFAC_V=$(awk 'BEGIN { printf "%.17g",((ARGV[1]/ARGV[2]) ** (1.0 / 3.0)) }' $R $O)
 
 # create a LAMMPS input file from the template
 cat ../infiles/in.lammps.GENERIC.template | 
