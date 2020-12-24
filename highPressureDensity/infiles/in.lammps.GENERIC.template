@@ -75,7 +75,7 @@ dump_modify    	gphase3 first yes
 dump_modify    	gphase3 scale no
 run            	5000000	# updated to 5ns to get target OLD density
 undump         	gphase3
-write_restart  	restart_files_density/V_MOLECULE_V.T${eqmT}K.P${Pout}MPa.*
+write_restart  	restart_files/V_MOLECULE_V.T${eqmT}K.P${Pout}MPa.*
 unfix		ensemble
 unfix 		thermostat
 unfix		compress
