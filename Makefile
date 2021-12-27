@@ -1,5 +1,6 @@
 #Examples for STAR
 #make DIR_PATH=AMB_P1 METHOD=local-run-parallel M=T NODESIZE=4 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily
+#make DIR_PATH=AMB_P1 METHOD=local-run-parallel M=T NODESIZE=16 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily
 #make DIR_PATH=AMB_P1 METHOD=local-run-serial M=T LAMMPS_EXE=lmp_daily
 #make DIR_PATH=AMB_P1 METHOD=submit M=T CLUSTER=bigred3
 #make DIR_PATH=AMB_P2 METHOD=submit M=T CLUSTER=bigred3
