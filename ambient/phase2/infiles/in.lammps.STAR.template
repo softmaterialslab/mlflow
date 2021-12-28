@@ -92,6 +92,7 @@ unfix		diffuse
 
 ####
 
+#### NEW NPT SIMULATION
 # do a npt simulation 
 # set the desired pressure & compute average density at that pressure
 
