@@ -92,6 +92,7 @@ unfix		diffuse
 
 ####
 
+#### NEW NPT SIMULATION
 # do a npt simulation 
 # set the desired pressure & compute average density at that pressure
 
@@ -99,7 +100,7 @@ fix 		barostat all npt temp ${eqmT} ${eqmT} 100.0 iso ${eqmP} ${eqmP} 1000.0
 fix 		dave all ave/time 10 100 1000 v_rho ave running file outfiles/eqm.density.out
 thermo		10000
 thermo_style   	custom step temp vol press density pe etotal
-run		1000000		# 1 nanoseconds
+run		100000000		# 100 nanoseconds
 unfix		barostat
 write_restart  	restart_files/star.barostat.*
 
