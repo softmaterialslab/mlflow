@@ -67,7 +67,7 @@ fix		output_pressure all ave/time 10 100 1000 v_pxx v_pyy v_pzz v_pxy v_pxz v_py
 fix 		state_variables all ave/time 10 100 1000 c_thermo_temp v_vol v_rho v_etotal v_a v_b v_c ave one file outfiles/state.variables.out
 thermo         	1000
 thermo_style   	custom step temp vol press density pe etotal
-dump           	gphase2 all atom 10000 outfiles/dumpgphase2.atom	# about 10 MB movie will be generated, change the 10000 to something else if smaller size is needed
+dump           	gphase2 all atom 100000 outfiles/dumpgphase2.atom	# about 10 MB movie will be generated, change the 100000 to something else if smaller size is needed
 dump_modify    	gphase2 first yes
 dump_modify    	gphase2 scale no
 run            	10000000	# this process of compressing to adjust to the final density is performed slowly so as to not "shock" the system
