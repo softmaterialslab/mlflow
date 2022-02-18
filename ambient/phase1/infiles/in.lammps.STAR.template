@@ -85,7 +85,7 @@ timestep       	1
 velocity       	all create ${eqmT} 34875304 dist gaussian units box
 fix	       	ensemble all nve
 fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
-fix		compress all deform 1 x scale 0.167 y scale 0.167 z scale 0.167  
+fix		compress all deform 1 x scale 0.1677 y scale 0.1677 z scale 0.1677 
 # the factor to scale is chose with some calculation based off on the initial density and where we need to get to in order to reach in the ballpark of desired density and average ambient pressure		
 # this factor depends on the molecular system
 fix		output_pressure all ave/time 10 100 1000 v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz c_thermo_press ave one file outfiles/pressure.tensor.out
@@ -95,7 +95,7 @@ thermo_style   	custom step temp vol press density pe etotal
 dump           	gphase1 all atom 10000 outfiles/dumpgphase1.atom	#note this will produce a rather heavy movie file of about 100 MB
 dump_modify    	gphase1 first yes
 dump_modify    	gphase1 scale no
-run            	10000000	# you could perform the compression even more slowly if any irregularities arise during the deformation (can be seen in the movie)
+run            	100000000	# you could perform the compression even more slowly if any irregularities arise during the deformation (can be seen in the movie)
 undump         	gphase1
 write_restart  	restart_files/star.gphase1.*
 unfix		ensemble
