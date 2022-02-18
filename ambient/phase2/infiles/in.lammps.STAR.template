@@ -70,7 +70,7 @@ thermo_style   	custom step temp vol press density pe etotal
 dump           	gphase2 all atom 10000 outfiles/dumpgphase2.atom	# about 10 MB movie will be generated, change the 10000 to something else if smaller size is needed
 dump_modify    	gphase2 first yes
 dump_modify    	gphase2 scale no
-run            	1000000	# this process of compressing to adjust to the final density is performed slowly so as to not "shock" the system
+run            	10000000	# this process of compressing to adjust to the final density is performed slowly so as to not "shock" the system
 undump         	gphase2
 write_restart  	restart_files/star.gphase2.*
 unfix		ensemble
