@@ -92,6 +92,33 @@ unfix		diffuse
 
 ####
 
+#### NEW NPT SIMULATION
+# do a npt simulation 
+# set the desired pressure & compute average density at that pressure
+
+fix 		barostat all npt temp ${eqmT} ${eqmT} 100.0 iso ${eqmP} ${eqmP} 1000.0
+fix 		dave all ave/time 10 100 1000 v_rho ave running file outfiles/eqm.density.out
+thermo		10000
+thermo_style   	custom step temp vol press density pe etotal
+run		100000000		# 100 nanoseconds
+unfix		barostat
+write_restart  	restart_files/star.barostat.*
+
+# find the adjustment factor needed to bring rho to the new average rho (target) 
+variable        averho equal f_dave
+variable        adjustrho equal (${rho}/${averho})^(1.0/3.0)
+
+# adjusting to the average rho; pressure would change (slightly)
+fix             ensemble all nve
+fix             thermostat all langevin ${eqmT} ${eqmT} 100.0 39847
+fix             adjust all deform 1 x scale ${adjustrho} y scale ${adjustrho} z scale ${adjustrho}
+thermo          10000
+thermo_style    custom step temp vol press density pe etotal
+run             1000000		# 1 nanoseconds
+unfix           ensemble
+unfix           thermostat
+unfix           adjust
+
 write_restart   restart_files/star.T${eqmT}K.P${Pout}MPa.*
 
 #shell		sh cleanlog.sh	# a script I wrote to clean the log.lammps file into just the thermodynamics data. commented out

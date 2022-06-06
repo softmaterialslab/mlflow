@@ -32,7 +32,9 @@ echo "Selected modecular model = $M"
 V_SCALEFAC_V=$(awk 'BEGIN { printf "%.17g",((ARGV[1]/ARGV[2]) ** (1.0 / 3.0)) }' $R $O)
 
 # create a LAMMPS input file from the template
-cat ../infiles/in.lammps.GENERIC.template | 
-sed -e 's/V_SCALEFAC_V/'$V_SCALEFAC_V'/g' | 
-sed -e 's/V_MOLECULE_V/'$M'/g' | 
+cat ../infiles/in.lammps.GENERIC.template | \
+sed -e 's/V_SCALEFAC_V/'$V_SCALEFAC_V'/g' | \
+sed -e 's/V_MOLECULE_V/'$M'/g' | \
+sed -e 's/USER-U-USER/'$U'/g' | \
+sed -e 's/V_PIN_V/'$E'/g' | \
 sed -e 's/V_POUT_V/'$P'/g' > ../in.highP
