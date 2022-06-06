@@ -12,6 +12,7 @@ O=0.867
 # Pin this variable is the in pressure for the sample generation of high pressure simulation
 E=0.1
 P=0.1
+U=293
 
 JOBSCR = highPressure.pbs
 JOBSCR_bigred3 = bigred3highPressure.pbs
@@ -32,7 +33,7 @@ create-dirs:
 run-preprocessor:
 	@echo "Running the preprocessor to create lammps script."
 	chmod +x shell_scripts/pre.processing.sh
-	cd shell_scripts && bash ./pre.processing.sh -M $(M) -R $(R) -O $(O) -E $(E) -P $(P) && cd ..
+	cd shell_scripts && bash ./pre.processing.sh -M $(M) -R $(R) -U $(U) -O $(O) -E $(E) -P $(P) && cd ..
 	@echo "Running the preprocessor is over."
 	
 submit: create-dirs run-preprocessor

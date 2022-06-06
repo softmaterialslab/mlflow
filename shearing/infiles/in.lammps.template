@@ -1,9 +1,10 @@
 # THIS IS A LAMMPS FILE TO SHEAR SQUALANE
 # Major update times:
 # 2020.02.11: updated to LAMMPS 2019
+# 2022.02.01: temperature added as a variable using "USER-U-USER"
 
 #--------------------------------RESTART------------------------------------#
-variable       	eqmT equal 293
+variable       	eqmT equal USER-U-USER
 variable       	temperature equal temp
 variable       	massdensity equal density
 variable       	pressure    equal press
@@ -22,7 +23,7 @@ variable       	dumpstep4   equal ${dumpstep}*10
 
 atom_style	molecular
 
-read_restart   	restart_files/USER-M-USER.T293K.PUSER-P-USERMPa.*
+read_restart   	restart_files/USER-M-USER.TUSER-U-USERK.PUSER-P-USERMPa.*
 
 neighbor       	0.3 bin
 neigh_modify   	every 1 delay 0 check yes
@@ -34,7 +35,7 @@ variable	dummytime equal step*dt
 
 variable 	exptsrate equal USER-S-USER		# 1e10 , 1e9, 1e8, 1e7   
 variable        srate equal ${exptsrate}/1e15		#0.00001 = 1e10, 0.000001 = 1e9, 0.0000001 = 1e8, 0.00000001 = 1e7, 0.000000001 = 1e6
-variable        runstep equal (60/${srate})/6 		#Now this will do 60 strain for each rate
+variable        runstep equal (60/${srate})/20 		#Now this will do 60 strain for each rate
 
 compute         myT all temp
 compute		tilt all temp/deform
@@ -59,6 +60,34 @@ thermo_modify	press ptilt
 dump            intra all custom ${dumpstep} data/data.rg.all.* id mol type mass xu yu zu vx vy vz
 dump            movie all atom ${dumpstep4} outfiles/nvt.shear.USER-M-USER.atom
 
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
+run             ${runstep}
+write_restart   restart_files/shear.USER-M-USER.*
 run             ${runstep}
 write_restart   restart_files/shear.USER-M-USER.*
 run             ${runstep}
