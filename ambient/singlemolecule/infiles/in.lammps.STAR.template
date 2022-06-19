@@ -1,0 +1,196 @@
+# THIS IS A LAMMPS FILE TO GENERATE 9-Octylheptadecane UNDER AMBIENT CONIDTIONS STARTING FROM LATTICE
+# iphase: start off a lattice with chains centered at each point of the lattice; then 
+# compress0: deform the box slowly at desired temp (generally ambient) to reach a low density state; then
+# barostat: do an NPT to extract average density (averho) the system wants to equilibrate to at ambient (0.1 MPa) pressure; then
+# compress1: deform to averho; then
+# compress2: deform to the expt density (e.g., for STAR: 0.791 g/cc, for SQL: 0.81 g/cc). ideally averho should be close to the expt value; then
+# thermostat: do an NVT to equilibrate and assess molecular system fidelity
+
+# ****** IMPORTANT: as written, this is for 1 MOLECULE ****** 
+# ++++++ to go from 1 to many: uncomment FOR MANY MOLECULES lines and comment FOR 1 MOLECULE lines. double check everything. for the last NVT follow my comments.  Once 1 molecule is clear, you can remove the 1 molecule lines to clean things up.
+# ****** AFTER 1 MOLECULE is CLEAR, try 125 molecules and see if things improve in terms of getting 0.791 than they were before. If 125 looks good, I suggest 500 for production runs. You can do 250 if 500 is too costly. 
+# I hope we can do better than 125 so that stat will help later.
+
+units		real
+dimension      	3
+
+boundary       	p p p			
+
+atom_style      molecular  		# bonds, angles, dihedrals, impropers : uncharged molecules
+
+#variable       bl equal 270		# FOR MANY MOLECULES, 6 times larger than desired size
+variable       	bl equal 540		# FOR 1 MOLECULE
+
+variable       	eqmT equal 311		# temperature desired: 311k
+variable       	eqmP equal 0.987	# ambient pressure desired, note 0.1MPa = 0.987 atm; real units use atm
+variable        pxx equal pxx
+variable        pyy equal pyy
+variable        pzz equal pzz
+variable        pxy equal pxy
+variable        pxz equal pxz
+variable        pyz equal pyz
+variable        a equal cella
+variable        b equal cellb
+variable        c equal cellc
+variable        rho equal density
+variable        vol equal vol
+variable        etotal equal etotal
+
+lattice        	fcc 45
+region         	simbox prism 0 ${bl} 0 ${bl} 0 ${bl} 0 0 0 units box side in
+
+# (type1: CH2) (type2: CH3 side) (type3: CH)
+# by defualt 1 is there so what ever the max column length -1 for extra:  example special bonds: max elements for row=2+2+4=8, so need 7
+create_box     	3 simbox bond/types 1 angle/types 1 dihedral/types 2 improper/types 1 extra/bond/per/atom 2 extra/angle/per/atom 3 extra/dihedral/per/atom 3 extra/improper/per/atom 1 extra/special/per/atom 8
+
+molecule       	V_MOLECULE_V infiles/UA.MG.STAR.txt
+lattice        	sc 45
+
+#region         	genbox prism 45 225 45 225 45 225 0 0 0 units box	# FOR 125 MOLECULES: seems this is what SETS 125 MOLECULES. uncomment this line to do many molecules. use the line below to do 1 molecule.
+region         	genbox prism 45 50 45 50 45 50 0 0 0 units box			# FOR 1 MOLECULE: make 1 molecule only
+
+create_atoms   	0 region genbox mol STAR 621634197 units box
+
+neighbor       	0.3 bin
+neigh_modify   	every 1 delay 0 check yes
+
+# parameters are largely obtained from Mondello & Grest (MG) model A in JCP 103, 7156 (1995) and followup 1996 paper
+# also refer to Moore et al (Cummings group) (2000) JCP 113, 8833
+mass           	1 14.026
+mass           	2 15.034
+mass           	3 13.018
+
+pair_style     	lj/cut 10			
+pair_modify    	shift yes			
+special_bonds  	lj 0.0 0.0 0.0
+	
+bond_style     	harmonic
+angle_style    	harmonic
+dihedral_style 	multi/harmonic
+improper_style	harmonic
+
+pair_coeff     	1 1 0.093 3.93 10
+pair_coeff     	1 2 0.145 3.93 10
+pair_coeff     	1 3 0.086 3.87 10
+pair_coeff     	2 2 0.227 3.93 10
+pair_coeff     	2 3 0.134 3.87 10
+pair_coeff     	3 3 0.080 3.81 10
+
+bond_coeff      1 448.126 1.54
+angle_coeff     1 62.14 114
+dihedral_coeff 	1 2.007 -4.012 0.271 6.290 0
+dihedral_coeff 	2 0.814 -1.792 0.389 3.673 0
+improper_coeff	1 40 27.25
+
+# initial phase to relax the molecule at their architecture level (MUST SEE MOVIE TO CHECK IF MOLECULES LOOK REASONABLE)
+thermo         	1
+thermo_style   	custom step temp vol press density pe etotal
+dump           	iphase all atom 10 outfiles/dumpiphase.atom
+dump_modify    	iphase first yes
+dump_modify    	iphase scale no
+minimize       	1.0e-5 1.0e-6 10000 10000
+undump         	iphase
+
+timestep       	1
+velocity       	all create ${eqmT} 34875304 dist gaussian units box
+
+# do a deform with langevin to reach a ballpark density (see movie to make sure the deform was not too rapid)
+fix	       	ensemble all nve
+fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
+
+#fix		compress0 all deform 1 x scale 0.1677 y scale 0.1677 z scale 0.1677 	# FOR MANY MOLECULES: The number 0.1677 is correctly computed based on a nearby and lower number to 0.791
+fix		compress0 all deform 1 x scale 0.5 y scale 0.5 z scale 0.5 	# FOR 1 MOLECULE
+
+fix		output_pressure all ave/time 10 100 1000 v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz c_thermo_press ave one file outfiles/pressure.tensor.out
+fix 		state_variables all ave/time 10 100 1000 c_thermo_temp v_vol v_rho v_etotal v_a v_b v_c ave one file outfiles/state.variables.out
+thermo         	10000
+thermo_style   	custom step temp vol press density pe etotal
+dump           	gphase0 all atom 10000 outfiles/deform0.atom	# calling this movie deform0.atom	
+dump_modify    	gphase0 first yes
+dump_modify    	gphase0 scale no
+
+#run            100000000 	# FOR MANY MOLECULES: 100 ns; this needs to be slow so as to not shock the system and trap it in some non-eqm state
+run            	100000 		# FOR 1 MOLECULE 
+
+undump         	gphase0
+write_restart  	restart_files/V_MOLECULE_V.gphase0.*
+unfix		ensemble
+unfix 		thermostat
+unfix		compress0
+
+# note: we are not unfixing output_pressure and state_variables because its good to see this output
+
+# do NPT to equilibrate at ambient pressure = 0.1 MPa; compute average density for later. NOT making movie here (could do if you want)
+fix             barostat all npt temp ${eqmT} ${eqmT} 100.0 iso ${eqmP} ${eqmP} 1000.0
+fix             dave all ave/time 10 100 1000 v_rho ave running file outfiles/eqm.density.out
+thermo          10000
+thermo_style    custom step temp vol press density pe etotal
+
+#run             50000000 	# FOR MANY MOLECULES: 50 ns 
+run             500000 		# FOR 1 MOLECULE  
+
+unfix           barostat
+write_restart   restart_files/V_MOLECULE_V.barostat.*
+
+# find the adjustment factor needed to bring rho (initial) to averho (target): (initial/target)**1/3. note rho is the density system settled to at the last sim step. 
+variable        averho equal f_dave
+variable        adjustrho1 equal (${rho}/${averho})^(1.0/3.0)
+unfix        	dave
+
+# do a deform to reach averho 
+fix	       	ensemble all nve
+fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
+fix		compress1 all deform 1 x scale ${adjustrho1} y scale ${adjustrho1} z scale ${adjustrho1}	
+thermo         	10000
+thermo_style   	custom step temp vol press density pe etotal
+dump           	gphase1 all atom 100000 outfiles/deform1.atom	
+dump_modify    	gphase1 first yes
+dump_modify    	gphase1 scale no
+
+#run            	10000000	# FOR MANY MOLECULES: 10 ns 
+run            	100000		# FOR 1 MOLECULE 
+
+undump         	gphase1
+write_restart  	restart_files/V_MOLECULE_V.gphase1.*
+unfix		ensemble
+unfix 		thermostat
+unfix		compress1
+
+### COMMENT OUT THIS compress 2 CODE when doing 1 MOLECULE ###
+
+# find the adjustment factor needed to bring rho (initial) to the expt density (target). note if compress1 did its job, rho should be averho
+#variable        adjustrho2 equal (${rho}/0.791)^(1.0/3.0)	# FOR MANY MOLECULES
+#variable        adjustrho2 equal (${rho}/${rho})^(1.0/3.0)	# FOR 1 MOLECULE
+
+# do a deform to reach expt density (0.791)
+#fix             ensemble all nve
+#fix             thermostat all langevin ${eqmT} ${eqmT} 100.0 39847
+#fix             compress2 all deform 1 x scale ${adjustrho2} y scale ${adjustrho2} z scale ${adjustrho2}
+#thermo          10000
+#thermo_style    custom step temp vol press density pe etotal
+#dump            gphase2 all atom 100000 outfiles/deform2.atom    
+#dump_modify     gphase2 first yes
+#dump_modify     gphase2 scale no
+
+#run            10000000      # FOR MANY MOLECULES: 10 ns 
+#run             100000        # FOR 1 MOLECULE
+
+#undump          gphase2
+#write_restart   restart_files/V_MOLECULE_V.gphase2.*
+#unfix           ensemble
+#unfix           thermostat
+#unfix           compress2
+
+# now we should have reached a fluid/liquid sample at 0.791/0.81 via a slow deformation from a gas (low density) state + NPT to settle into a density at ambient P.
+
+# do NVT to equilibrate the sample
+fix             diffuse all nvt temp ${eqmT} ${eqmT} 100.0
+thermo          100						# for 1 molecule: 100. for 500 molecules: 50000
+thermo_style   	custom step temp vol press density pe etotal
+dump           	movie1 all atom 100 outfiles/sample.atom 	# for 1 molecule: 100. for 500 molecules: 500000 (check the movie size and increase this number if you prefer)
+run             1000000						# for 1 molecule: 100000 steps (0.1 ns). for 500 molecules: 100000000 steps (100 ns)
+undump          movie1
+unfix           diffuse
+
+unfix           output_pressure
+unfix           state_variables
