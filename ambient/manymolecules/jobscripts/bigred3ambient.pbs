@@ -1,12 +1,12 @@
 #!/bin/bash
 #####  Constructed by Kadupitiya #####
-#SBATCH --mail-user=kadu@iu.edu
+#SBATCH --mail-user=vjadhao@iu.edu
 #SBATCH --nodes=4
 #SBATCH --ntasks-per-node=48
 #SBATCH --time=1-00:00:00
 #SBATCH --partition=general
 #SBATCH --mail-type=FAIL,BEGIN,END
-#SBATCH --job-name=phase1
+#SBATCH --job-name=ambient
 #SBATCH --output=out.log
 #SBATCH --error=err.log
 

@@ -21,9 +21,9 @@ variable        rho equal density
 variable        vol equal vol
 variable        etotal equal etotal
 
-variable        movieSTEP   equal    10000
+variable        movieSTEP   equal    100000
 variable        movieSTEP10x   equal ${movieSTEP}*10
-variable        thermoSTEP  equal    10000
+variable        thermoSTEP  equal    100000
 variable        runSTEP     equal    10000000
 variable        runSTEP5x   equal    ${runSTEP}*5
 variable        runSTEP10x  equal    ${runSTEP}*10
@@ -87,8 +87,8 @@ velocity       	all create ${eqmT} 34875304 dist gaussian units box
 fix	       	    ensemble all nve
 fix 		    thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
 fix		        compress0 all deform 1 x scale 0.464 y scale 0.464 z scale 0.464 	
-fix		        output_pressure all ave/time 10 100 1000 v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz ave one file outfiles/pressure.tensor.out
-fix 		    state_variables all ave/time 10 100 1000 c_thermo_temp v_vol v_rho v_etotal c_thermo_press ave one file outfiles/state.variables.out
+fix		        output_pressure all ave/time 100 100 10000 v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz ave one file outfiles/pressure.tensor.out
+fix 		    state_variables all ave/time 100 100 10000 c_thermo_temp v_vol v_rho v_etotal c_thermo_press ave one file outfiles/state.variables.out
 run             ${runSTEP5x}
 unfix		    ensemble
 unfix 		    thermostat
