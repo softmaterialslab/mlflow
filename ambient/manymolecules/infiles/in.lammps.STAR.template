@@ -2,13 +2,15 @@
 # UA model parameters from Mondello & Grest (MG) model A in JCP 103, 7156 (1995) and followup 1996 paper
 # also refer to Moore et al JCP 113, 8833 (2000); McCabe et al JCP 114, 1887 (2001)
 
-units		    real
+# total simulation time: 220 ns. expected walltime: < 30 hours (1 day + 6 hours) on 192 cores (4 * 48) on br3. 
+
+units		real
 dimension      	3
 boundary       	p p p			
-atom_style      molecular  		    # bonds, angles, dihedrals, impropers : uncharged molecules
+atom_style      molecular  		# bonds, angles, dihedrals, impropers : uncharged molecules
 
 variable        simboxL equal 315	# simulation box length for N_molecules = 125: 27; for 216: 315; for 343: 360
-variable        genboxL equal 270   # molecule placement edge for N_molecules = 125: 225; for 216: 270; for 343: 315     
+variable        genboxL equal 270   	# molecule placement edge for N_molecules = 125: 225; for 216: 270; for 343: 315     
 variable       	eqmT equal 311		# temperature desired: 311k
 variable       	eqmP equal 0.987	# ambient pressure desired, note 0.1MPa = 0.987 atm; real units use atm
 variable        pxx equal pxx
@@ -21,12 +23,17 @@ variable        rho equal density
 variable        vol equal vol
 variable        etotal equal etotal
 
-variable        movieSTEP   equal    100000
-variable        movieSTEP10x   equal ${movieSTEP}*10
-variable        thermoSTEP  equal    100000
-variable        runSTEP     equal    10000000
-variable        runSTEP5x   equal    ${runSTEP}*5
-variable        runSTEP10x  equal    ${runSTEP}*10
+variable        movieSTEP   	equal	100000
+variable        movieSTEP10x   	equal 	${movieSTEP}*10
+variable        thermoSTEP  	equal   100000
+variable        runSTEP     	equal   5000000
+variable        runSTEP2x   	equal   ${runSTEP}*2
+variable        runSTEP5x  	equal   ${runSTEP}*5
+variable        runSTEP6x  	equal   ${runSTEP}*6
+variable        runSTEP10x  	equal   ${runSTEP}*10
+
+variable	targetRHO	equal 	0.791
+variable	nearRHO		equal	0.781
 
 lattice        	fcc 45
 region         	simbox prism 0 ${simboxL} 0 ${simboxL} 0 ${simboxL} 0 0 0 units box side in
@@ -84,15 +91,15 @@ timestep       	1
 velocity       	all create ${eqmT} 34875304 dist gaussian units box
 
 # do a deform with langevin to start compression (1st stage, deform by 10x)
-fix	       	    ensemble all nve
-fix 		    thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
-fix		        compress0 all deform 1 x scale 0.464 y scale 0.464 z scale 0.464 	
-fix		        output_pressure all ave/time 100 100 10000 v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz ave one file outfiles/pressure.tensor.out
-fix 		    state_variables all ave/time 100 100 10000 c_thermo_temp v_vol v_rho v_etotal c_thermo_press ave one file outfiles/state.variables.out
-run             ${runSTEP5x}
-unfix		    ensemble
-unfix 		    thermostat
-unfix		    compress0
+fix	       	ensemble all nve
+fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
+fix		compress0 all deform 1 x scale 0.464 y scale 0.464 z scale 0.464 	
+fix		output_pressure all ave/time 100 100 10000 v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz ave one file outfiles/pressure.tensor.out
+fix 		state_variables all ave/time 100 100 10000 c_thermo_temp v_vol v_rho v_etotal c_thermo_press ave one file outfiles/state.variables.out
+run             ${runSTEP6x}
+unfix		ensemble
+unfix 		thermostat
+unfix		compress0
 
 # do NVT to equilibrate the sample
 fix             equilibrate all nvt temp ${eqmT} ${eqmT} 100.0		
@@ -100,27 +107,30 @@ run             ${runSTEP}
 unfix           equilibrate
 
 # do a deform with langevin to start compression (2nd stage, deform by another 10x)
-fix	       	    ensemble all nve
-fix 		    thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
-fix		        compress0 all deform 1 x scale 0.464 y scale 0.464 z scale 0.464 
-run             ${runSTEP5x} 
-unfix		    ensemble
-unfix 		    thermostat
-unfix		    compress0
+fix	       	ensemble all nve
+fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
+fix		compress0 all deform 1 x scale 0.464 y scale 0.464 z scale 0.464 
+run             ${runSTEP6x} 
+unfix		ensemble
+unfix 		thermostat
+unfix		compress0
 
 # do NVT to equilibrate the sample
 fix             equilibrate all nvt temp ${eqmT} ${eqmT} 100.0		
 run             ${runSTEP}     						
 unfix           equilibrate
 
+# find the adjustment factor needed to bring rho (initial) to just below the expt density (target). 
+variable        reachNearRho equal (${rho}/${nearRHO})^(1.0/3.0)	
+
 # do a deform with langevin to reach near the target density 
-fix	       	    ensemble all nve
-fix 		    thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
-fix		        compress0 all deform 1 x scale 0.81 y scale 0.81 z scale 0.81
-run             ${runSTEP5x}
-unfix		    ensemble
-unfix 		    thermostat
-unfix		    compress0
+fix	       	ensemble all nve
+fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
+fix		compress0 all deform 1 x scale ${reachNearRho} y scale ${reachNearRho} z scale ${reachNearRho}
+run             ${runSTEP6x}
+unfix		ensemble
+unfix 		thermostat
+unfix		compress0
 
 # do NPT to equilibrate at ambient pressure = 0.1 MPa
 fix             barostat all npt temp ${eqmT} ${eqmT} 100.0 iso ${eqmP} ${eqmP} 1000.0
@@ -130,7 +140,7 @@ unfix           barostat
 # do NPT to equilibrate at ambient pressure = 0.1 MPa; compute average density for later.
 fix             barostat all npt temp ${eqmT} ${eqmT} 100.0 iso ${eqmP} ${eqmP} 1000.0
 fix             dave all ave/time 10 100 1000 v_rho ave running file outfiles/eqm.density.out
-run             ${runSTEP5x} 
+run             ${runSTEP10x} 
 unfix           barostat
 
 # find the adjustment factor needed to bring rho (initial) to averho (target): (initial/target)**1/3. 
@@ -139,29 +149,29 @@ variable        adjustrho1 equal (${rho}/${averho})^(1.0/3.0)
 unfix        	dave
 
 # do a deform to reach averho 
-fix	       	    ensemble all nve
-fix 		    thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
-fix		        compress1 all deform 1 x scale ${adjustrho1} y scale ${adjustrho1} z scale ${adjustrho1}
+fix	       	ensemble all nve
+fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
+fix		compress1 all deform 1 x scale ${adjustrho1} y scale ${adjustrho1} z scale ${adjustrho1}
 run            	${runSTEP}
-unfix		    ensemble
-unfix 		    thermostat
-unfix		    compress1
+unfix		ensemble
+unfix 		thermostat
+unfix		compress1
 
 # find the adjustment factor needed to bring rho (initial) to the expt density (target). 
-variable        adjustrho2 equal (${rho}/0.791)^(1.0/3.0)	
+variable        adjustrho2 equal (${rho}/${targetRHO})^(1.0/3.0)	
 
-# do a deform to reach expt density (0.791)
+# do a deform to reach expt density (targetRHO)
 fix             ensemble all nve
 fix             thermostat all langevin ${eqmT} ${eqmT} 100.0 39847
 fix             compress2 all deform 1 x scale ${adjustrho2} y scale ${adjustrho2} z scale ${adjustrho2}
-run             ${runSTEP} 
+run             ${runSTEP2x} 
 unfix           ensemble
 unfix           thermostat
 unfix           compress2
 
 undump          frame_sample
 
-# now we should have reached a fluid/liquid sample at 0.791 g/cc
+# now we should have reached a fluid/liquid sample at targetRHO
 
 # do NVT to equilibrate the sample further and create the final sample at 311 K, 0.1 MPa, 0.791 g/cc
 fix             ambient all nvt temp ${eqmT} ${eqmT} 100.0
