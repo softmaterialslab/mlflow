@@ -29,11 +29,11 @@ variable        thermoSTEP  	equal   100000
 variable        runSTEP     	equal   5000000
 variable        runSTEP2x   	equal   ${runSTEP}*2
 variable        runSTEP5x  	equal   ${runSTEP}*5
-variable        runSTEP6x  	equal   ${runSTEP}*6
 variable        runSTEP10x  	equal   ${runSTEP}*10
+variable        runSTEP40x  	equal   ${runSTEP}*40
 
 variable	targetRHO	equal 	0.791
-variable	nearRHO		equal	0.781
+variable	nearRHO		equal	0.75
 
 lattice        	fcc 45
 region         	simbox prism 0 ${simboxL} 0 ${simboxL} 0 ${simboxL} 0 0 0 units box side in
@@ -90,44 +90,16 @@ minimize       	1.0e-5 1.0e-6 10000 10000
 timestep       	1
 velocity       	all create ${eqmT} 34875304 dist gaussian units box
 
-# do a deform with langevin to start compression (1st stage, deform by 10x)
-fix	       	ensemble all nve
-fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
-fix		compress0 all deform 1 x scale 0.464 y scale 0.464 z scale 0.464 	
-fix		output_pressure all ave/time 100 100 10000 v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz ave one file outfiles/pressure.tensor.out
-fix 		state_variables all ave/time 100 100 10000 c_thermo_temp v_vol v_rho v_etotal c_thermo_press ave one file outfiles/state.variables.out
-run             ${runSTEP6x}
-unfix		ensemble
-unfix 		thermostat
-unfix		compress0
-
-# do NVT to equilibrate the sample
-fix             equilibrate all nvt temp ${eqmT} ${eqmT} 100.0		
-run             ${runSTEP}     						
-unfix           equilibrate
-
-# do a deform with langevin to start compression (2nd stage, deform by another 10x)
-fix	       	ensemble all nve
-fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
-fix		compress0 all deform 1 x scale 0.464 y scale 0.464 z scale 0.464 
-run             ${runSTEP6x} 
-unfix		ensemble
-unfix 		thermostat
-unfix		compress0
-
-# do NVT to equilibrate the sample
-fix             equilibrate all nvt temp ${eqmT} ${eqmT} 100.0		
-run             ${runSTEP}     						
-unfix           equilibrate
-
 # find the adjustment factor needed to bring rho (initial) to just below the expt density (target). 
 variable        reachNearRho equal (${rho}/${nearRHO})^(1.0/3.0)	
 
-# do a deform with langevin to reach near the target density 
+# do a deform with langevin to start compression (1st stage, deform by 10x)
 fix	       	ensemble all nve
 fix 		thermostat all langevin ${eqmT} ${eqmT} 100.0 39847 			
 fix		compress0 all deform 1 x scale ${reachNearRho} y scale ${reachNearRho} z scale ${reachNearRho}
-run             ${runSTEP6x}
+fix		output_pressure all ave/time 100 100 10000 v_pxx v_pyy v_pzz v_pxy v_pxz v_pyz ave one file outfiles/pressure.tensor.out
+fix 		state_variables all ave/time 100 100 10000 c_thermo_temp v_vol v_rho v_etotal c_thermo_press ave one file outfiles/state.variables.out
+run             ${runSTEP40x}
 unfix		ensemble
 unfix 		thermostat
 unfix		compress0
