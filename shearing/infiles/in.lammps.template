@@ -1,4 +1,4 @@
-# THIS IS A LAMMPS FILE TO SHEAR SQUALANE
+# THIS IS A LAMMPS FILE TO SHEAR SMALL-MOLECULAR LIQUIDS
 # Major update times:
 # 2020.02.11: updated to LAMMPS 2019
 # 2022.02.01: temperature added as a variable using "USER-U-USER"
@@ -12,14 +12,14 @@ variable       	volume      equal vol
 
 variable       	dumpstep    equal USER-F-USER
 variable       	dumpstep2   equal ${dumpstep}/10
-variable       	dumpstep3   equal 10 #${dumpstep}/dumpstep2
+variable       	dumpstep3   equal 10 		# ${dumpstep}/dumpstep2
 variable       	dumpstep4   equal ${dumpstep}*10
 
-#Nevery=dumpstep3, Nrepeat=dumpstep2, and Nfreq=dumpstep;   Nevery*Nrepeat <= Nfreq
-#example Nevery=2, Nrepeat=6, Nfreq=100
-# Nfreq=100: Means every 100th step there willbe average
-# Nrepeat=6:  Means 90, 92, 94, 96, 98, 100
-# Nevery=2: Means gap between 90,92 and so on
+# Nevery=dumpstep3, Nrepeat=dumpstep2, and Nfreq=dumpstep; Nevery*Nrepeat <= Nfreq
+# example: Nevery=2, Nrepeat=6, Nfreq=100
+# Nfreq=100 means every 100th step there will be average
+# Nrepeat=6 means 90, 92, 94, 96, 98, 100
+# Nevery=2 means gap between 90, 92 and so on
 
 atom_style	molecular
 
@@ -33,9 +33,9 @@ timestep       	1
 reset_timestep	0
 variable	dummytime equal step*dt
 
-variable 	exptsrate equal USER-S-USER		# 1e10 , 1e9, 1e8, 1e7   
-variable        srate equal ${exptsrate}/1e15		#0.00001 = 1e10, 0.000001 = 1e9, 0.0000001 = 1e8, 0.00000001 = 1e7, 0.000000001 = 1e6
-variable        runstep equal (60/${srate})/20 		#Now this will do 60 strain for each rate
+variable 	exptsrate equal USER-S-USER		# 1e10, 1e9, 1e8, 1e7, etc.   
+variable        srate equal ${exptsrate}/1e15		# 0.00001 = 1e10, 0.000001 = 1e9, 0.0000001 = 1e8, 0.00000001 = 1e7, 0.000000001 = 1e6
+variable        runstep equal (120/${srate})/20 		# this will do 120 strain
 
 compute         myT all temp
 compute		tilt all temp/deform
@@ -49,7 +49,7 @@ variable        stress equal (-1)*c_ptilt[4]
 variable        h1 equal c_ptilt[1]
 variable        h2 equal c_ptilt[2]
 variable        h3 equal c_ptilt[3]
-fix             ssave all ave/time ${dumpstep3} ${dumpstep2} ${dumpstep} v_strain v_stress ave one file outfiles/strain.stress.out	#10, 20, ..., 100, ..., 910, 920, ... 1000
+fix             ssave all ave/time ${dumpstep3} ${dumpstep2} ${dumpstep} v_strain v_stress ave one file outfiles/strain.stress.out	# example: 10, 20, ..., 100, ..., 910, 920, ... 1000
 fix             pressave all ave/time ${dumpstep3} ${dumpstep2} ${dumpstep} v_strain v_h1 v_h2 v_h3 ave one file outfiles/pressure.out
 fix             virialave all ave/time ${dumpstep3} ${dumpstep2} ${dumpstep} v_strain c_myP[1] c_myP[2] c_myP[3] c_myP[4] c_myP[5] c_myP[6] ave one file outfiles/virial.out
 fix             ktensorave all ave/time ${dumpstep3} ${dumpstep2} ${dumpstep} v_strain c_tilt[1] c_tilt[2] c_tilt[3] c_tilt[4] c_tilt[5] c_tilt[6] ave one file outfiles/ktensor.out
