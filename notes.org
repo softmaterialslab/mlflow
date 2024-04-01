@@ -1,5 +1,12 @@
 #+TITLE: simulating nonadecane: generation and shear
 
+Operation 06.30.2022:
+
+** making ambient sample on bigred3
+- check jobscripts, infiles folder, monitor space consumed by a test run
+- make DIR_PATH=AMB_MANY METHOD=submit M=T T=star CLUSTER=bigred3
+- make clean DIR_PATH=AMB_MANY
+
 Subtext: need to see if unsupervised ML can classify features in a complex molecular fluid
 
 ** Model file creation

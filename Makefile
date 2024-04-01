@@ -1,14 +1,17 @@
 #Examples for STAR
-#make DIR_PATH=AMB_P1 METHOD=local-run-parallel M=T NODESIZE=4 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily
-#make DIR_PATH=AMB_P1 METHOD=local-run-serial M=T LAMMPS_EXE=lmp_daily
-#make DIR_PATH=AMB_P1 METHOD=submit M=T CLUSTER=bigred3
-#make DIR_PATH=AMB_P2 METHOD=submit M=T CLUSTER=bigred3
+#make DIR_PATH=AMB_SINGLE METHOD=local-run-parallel M=T T=star NODESIZE=4 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily
+#make DIR_PATH=AMB_SINGLE METHOD=local-run-parallel M=T T=star NODESIZE=16 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily
+#make DIR_PATH=AMB_SINGLE METHOD=local-run-serial M=T T=star LAMMPS_EXE=lmp_daily
+#make DIR_PATH=AMB_SINGLE METHOD=submit M=T T=star CLUSTER=bigred3
+#make DIR_PATH=AMB_MANY METHOD=local-run-parallel M=T T=star NODESIZE=16 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily
+#make DIR_PATH=AMB_MANY METHOD=submit M=T T=star CLUSTER=bigred3
+#make DIR_PATH=SHEAR METHOD=submit M=T T=star P=0.1 U=311 S=1e10 F=1000 CLUSTER=bigred3
 
 #Examples for SQL
-#make DIR_PATH=AMB_P1 METHOD=local-run-parallel M=S NODESIZE=4 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily
-#make DIR_PATH=AMB_P1 METHOD=local-run-serial M=S LAMMPS_EXE=lmp_daily
-#make DIR_PATH=AMB_P1 METHOD=submit M=S CLUSTER=bigred3
-#make DIR_PATH=AMB_P2 METHOD=submit M=S CLUSTER=bigred3
+#make DIR_PATH=AMB_SINGLE METHOD=local-run-parallel M=S NODESIZE=4 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily
+#make DIR_PATH=AMB_SINGLE METHOD=local-run-serial M=S LAMMPS_EXE=lmp_daily
+#make DIR_PATH=AMB_SINGLE METHOD=submit M=S CLUSTER=bigred3
+#make DIR_PATH=AMB_MANY METHOD=submit M=S CLUSTER=bigred3
 #make DIR_PATH=SHEAR METHOD=local-run-parallel NODESIZE=4 MPI_EXE=mpirun LAMMPS_EXE=lmp_daily M=S P=0.1 S=1e10 F=1000
 #make DIR_PATH=SHEAR METHOD=local-run-serial MPI_EXE=mpirun LAMMPS_EXE=lmp_daily M=S P=100 S=1e10 F=1000
 #make DIR_PATH=SHEAR METHOD=submit M=S P =0.1 S=1e10 F=1000 CLUSTER=bigred3
@@ -33,8 +36,8 @@
 
 
 #Cleaning
-#make clean DIR_PATH=AMB_P1
-#make clean DIR_PATH=AMB_P2
+#make clean DIR_PATH=AMB_SINGLE
+#make clean DIR_PATH=AMB_MANY
 #make clean DIR_PATH=SHEAR
 #make clean DIR_PATH=HP
 #make clean DIR_PATH=HP_DEN
@@ -45,7 +48,7 @@ AMB = ambient
 HP = highPressure
 HP_DEN = highPressureDensity
 SHEAR = shearing
-DIR_PATH = AMB_P1
+DIR_PATH = AMB_SINGLE
 METHOD = submit
 M=S
 T=sql
@@ -66,6 +69,7 @@ E=0.1
 P=0.1
 S=1e10
 F=1000
+U=293
 
 all:
 	@echo "Starting build of the $(DIR_PATH) directory";
@@ -76,36 +80,32 @@ else ifeq ($(M),S)
 	@echo "SQUALANE molecule is selected";
 endif
 	
-ifeq ($(DIR_PATH),AMB_P1)
-	+$(MAKE) -C $(AMB)/phase1 $(METHOD) M=$(M) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER)
-else ifeq ($(DIR_PATH),AMB_P2)
-	@echo "Searching for $(RESTART_FILE_1) restart file";
-	if ! test -f $(AMB)/phase1/restart_files/$(RESTART_FILE_1) ; then echo "You need phase1 restart file in $(AMB)/phase1/restart_files/$(RESTART_FILE_1) folder to start phase2"; exit 1; fi
-	@echo "Copying restart files from phase1 to phase2";
-	cp -r $(AMB)/phase1/restart_files $(AMB)/phase2/
-	+$(MAKE) -C $(AMB)/phase2 $(METHOD) M=$(M) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER)
+ifeq ($(DIR_PATH),AMB_SINGLE)
+	+$(MAKE) -C $(AMB)/singlemolecule $(METHOD) M=$(M) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER)
+else ifeq ($(DIR_PATH),AMB_MANY)
+	+$(MAKE) -C $(AMB)/manymolecules $(METHOD) M=$(M) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER)
 else ifeq ($(DIR_PATH),HP)
 	@echo "Searching for $(T).T293K.P$(E)MPa.* restart file";
 ifeq ($(E),0.1)
-	if ! test -f $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need phase2 restart file: $(AMB)/phase2/restart_files/$(T).T293K.P$(E)MPa.* to start HP simulation for $(P)MPa"; exit 1; fi
-	@echo "Copying restart files from phase2 to HP folder";
-	cp -r $(AMB)/phase2/restart_files $(HP)/
+	if ! test -f $(AMB)/manymolecules/restart_files/$(T).T$(U)K.P$(E)MPa.* ; then echo "You need manymolecules restart file: $(AMB)/manymolecules/restart_files/$(T).T$(U)K.P$(E)MPa.* to start HP simulation for $(P)MPa"; exit 1; fi
+	@echo "Copying restart files from manymolecules to HP folder";
+	cp -r $(AMB)/manymolecules/restart_files $(HP)/
 else
-	if ! test -f $(HP)/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need the restart file: $(HP)/restart_files/$(T).T293K.P$(E)MPa.* to start HP simulation for $(P)MPa"; exit 1; fi
+	if ! test -f $(HP)/restart_files/$(T).T$(U)K.P$(E)MPa.* ; then echo "You need the restart file: $(HP)/restart_files/$(T).T$(U)K.P$(E)MPa.* to start HP simulation for $(P)MPa"; exit 1; fi
 endif
-	+$(MAKE) -C $(HP) $(METHOD) M=$(M) P=$(P) R=$(R) O=$(O) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER) RESTART_FILE_HP=$(T).T293K.P$(E)MPa.*
+	+$(MAKE) -C $(HP) $(METHOD) M=$(M) P=$(P) R=$(R) O=$(O) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER) RESTART_FILE_HP=$(T).T$(U)K.P$(E)MPa.*
 else ifeq ($(DIR_PATH),HP_DEN)
-	@echo "Searching for $(T).T293K.P$(E)MPa.* restart file";
-	if ! test -f $(HP_DEN)/restart_files/$(T).T293K.P$(E)MPa.* ; then echo "You need the restart file: $(HP_DEN)/restart_files/$(T).T293K.P$(E)MPa.* to start Deformation simulation for $(P)MPa"; exit 1; fi
-	+$(MAKE) -C $(HP_DEN) $(METHOD) M=$(M) P=$(P) R=$(R) O=$(O) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER) RESTART_FILE_HP=$(T).T293K.P$(E)MPa.*
+	@echo "Searching for $(T).T$(U)K.P$(E)MPa.* restart file";
+	if ! test -f $(HP_DEN)/restart_files/$(T).T$(U)K.P$(E)MPa.* ; then echo "You need the restart file: $(HP_DEN)/restart_files/$(T).T$(U)K.P$(E)MPa.* to start Deformation simulation for $(P)MPa"; exit 1; fi
+	+$(MAKE) -C $(HP_DEN) $(METHOD) M=$(M) P=$(P) R=$(R) O=$(O) MPI_EXE=$(MPI_EXE) NODESIZE=$(NODESIZE) LAMMPS_EXE=$(LAMMPS_EXE) CLUSTER=$(CLUSTER) RESTART_FILE_HP=$(T).T$(U)K.P$(E)MPa.*
 else ifeq ($(DIR_PATH),SHEAR)
-	@echo "Searching for $(T).T293K.P$(P)MPa.* restart file";
+	@echo "Searching for $(T).T$(U)K.P$(P)MPa.* restart file";
 ifeq ($(P),0.1)
-	if ! test -f $(AMB)/phase2/restart_files/$(T).T293K.P$(P)MPa.* ; then echo "You need phase2 restart file $(AMB)/phase2/restart_files/$(T).T293K.P$(P)MPa.* to start shearing"; exit 1; fi
-	@echo "Copying restart files from phase2 to shearing folder";
-	cp -r $(AMB)/phase2/restart_files $(SHEAR)/
+	if ! test -f $(AMB)/manymolecules/restart_files/$(T).T$(U)K.P$(P)MPa.* ; then echo "You need manymolecules restart file $(AMB)/manymolecules/restart_files/$(T).T$(U)K.P$(P)MPa.* to start shearing"; exit 1; fi
+	@echo "Copying restart files from manymolecules to shearing folder";
+	cp -r $(AMB)/manymolecules/restart_files $(SHEAR)/
 else
-	if ! test -f $(HP)/restart_files/$(T).T293K.P$(P)MPa.* ; then echo "You need high pressure restart file $(HP)/restart_files/$(T).T293K.P$(P)MPa.* to start shearing"; exit 1; fi
+	if ! test -f $(HP)/restart_files/$(T).T$(U)K.P$(P)MPa.* ; then echo "You need high pressure restart file $(HP)/restart_files/$(T).T$(U)K.P$(P)MPa.* to start shearing"; exit 1; fi
 	@echo "Copying restart files from $(HP)/restart_files to shearing folder";
 	cp -r $(HP)/restart_files $(SHEAR)/
 endif
@@ -117,10 +117,10 @@ endif
 
 clean:
 	@echo "Cleaning the $(DIR_PATH) directory";
-ifeq ($(DIR_PATH),AMB_P1)
-	+$(MAKE) -C $(AMB)/phase1 clean
-else ifeq ($(DIR_PATH),AMB_P2)
-	+$(MAKE) -C $(AMB)/phase2 clean
+ifeq ($(DIR_PATH),AMB_SINGLE)
+	+$(MAKE) -C $(AMB)/singlemolecule clean
+else ifeq ($(DIR_PATH),AMB_MANY)
+	+$(MAKE) -C $(AMB)/manymolecules clean
 else ifeq ($(DIR_PATH),HP)
 	+$(MAKE) -C $(HP) clean
 else ifeq ($(DIR_PATH),HP_DEN)
